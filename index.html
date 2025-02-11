@@ -69,7 +69,13 @@
       transition: border-color 0.3s;
     }
     input:focus { border-color: #007aff; outline: none; }
-    input[type="file"] { display: none; }
+    /* Statt display: none; verwenden wir diese Technik, um den File-Input unsichtbar aber fokussierbar zu halten */
+    input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+    }
     .label-file {
       display: inline-block;
       padding: 12px 20px;
@@ -231,7 +237,8 @@
           <input type="text" id="input-product-price" placeholder="Preis (z.B. 9.99)" required>
           <input type="number" id="input-product-points" placeholder="Punkte (z.B. 10)" value="0">
           <label class="label-file" for="input-product-image">Bild hochladen</label>
-          <input type="file" id="input-product-image" accept="image/*" required>
+          <!-- Hier haben wir das "required" entfernt und den Input so gestylt, dass er unsichtbar, aber fokussierbar bleibt -->
+          <input type="file" id="input-product-image" accept="image/*" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
           <button type="submit">Hinzufügen</button>
           <button type="button" id="btn-cancel-add-product">Abbrechen</button>
         </form>
