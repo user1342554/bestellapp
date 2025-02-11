@@ -1,0 +1,7 @@
+[build]
+  publish = "."
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["faunadb"]
+  included_files = ["netlify/functions/products.mjs"]
