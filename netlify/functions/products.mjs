@@ -1,12 +1,3 @@
-// Setze global.localStorage, falls nicht vorhanden (in Node ist localStorage nicht definiert)
-if (typeof global.localStorage === 'undefined') {
-  global.localStorage = {
-    getItem() { return null; },
-    setItem() { },
-    removeItem() { }
-  };
-}
-
 import faunadb from "faunadb";
 
 // Den FaunaDB-Client instanziieren
@@ -38,6 +29,7 @@ export async function handler(event, context) {
         body: JSON.stringify(data)
       };
     }
+    
     // POST: Neues Produkt anlegen
     if (method === "POST") {
       if (!event.body) {
@@ -69,6 +61,7 @@ export async function handler(event, context) {
         })
       };
     }
+    
     // DELETE: Ein Produkt löschen
     if (method === "DELETE") {
       const id = event.queryStringParameters?.id;
@@ -86,6 +79,7 @@ export async function handler(event, context) {
         body: JSON.stringify(delResult)
       };
     }
+    
     return {
       statusCode: 405,
       body: JSON.stringify({ error: "Method Not Allowed" })
