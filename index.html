@@ -69,7 +69,7 @@
       transition: border-color 0.3s;
     }
     input:focus { border-color: #007aff; outline: none; }
-    /* Statt display: none; verwenden wir diese Technik, um den File-Input unsichtbar aber fokussierbar zu halten */
+    /* Statt display: none, damit der File-Input unsichtbar, aber fokussierbar bleibt */
     input[type="file"] {
       position: absolute;
       opacity: 0;
@@ -186,7 +186,6 @@
 </head>
 <body>
   <div class="container">
-    
     <!-- Kundendaten Screen -->
     <div id="screen-kundendaten" class="screen active">
       <div class="header">
@@ -237,7 +236,7 @@
           <input type="text" id="input-product-price" placeholder="Preis (z.B. 9.99)" required>
           <input type="number" id="input-product-points" placeholder="Punkte (z.B. 10)" value="0">
           <label class="label-file" for="input-product-image">Bild hochladen</label>
-          <!-- Hier haben wir das "required" entfernt und den Input so gestylt, dass er unsichtbar, aber fokussierbar bleibt -->
+          <!-- File-Input: unsichtbar, aber fokussierbar -->
           <input type="file" id="input-product-image" accept="image/*" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
           <button type="submit">Hinzufügen</button>
           <button type="button" id="btn-cancel-add-product">Abbrechen</button>
@@ -283,7 +282,6 @@
       </div>
       <button id="btn-export-excel">Bestellungen als Excel exportieren</button>
       <button id="btn-new-order">Neue Bestellung</button>
-      <!-- Neuer Button zum Löschen alter Bestellungen -->
       <button id="btn-clear-orders">Alte Bestellungen löschen</button>
       <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
     </div>
@@ -397,11 +395,9 @@
       await loadProducts();
       const listDiv = document.getElementById('operator-products-list');
       listDiv.innerHTML = "";
-
       products.forEach((product, index) => {
         const prodDiv = document.createElement('div');
         prodDiv.classList.add('product-card');
-        
         let html = "";
         if (product.imageData) {
           html += `<img class="product-image" src="${product.imageData}" alt="${product.name}">`;
@@ -412,7 +408,6 @@
                  Preis: ${parseFloat(product.price).toFixed(2)} €<br>
                  Punkte: ${product.points}<br>`;
         prodDiv.innerHTML = html;
-
         const removeBtn = document.createElement('button');
         removeBtn.textContent = "Entfernen";
         removeBtn.style.backgroundColor = "#FF3B30";
@@ -425,7 +420,6 @@
             console.error("Fehler beim Löschen des Produkts:", err);
           }
         });
-
         prodDiv.appendChild(removeBtn);
         listDiv.appendChild(prodDiv);
       });
@@ -462,8 +456,7 @@
       const priceStr = document.getElementById('input-product-price').value.trim().replace(',', '.');
       const points = parseInt(document.getElementById('input-product-points').value.trim()) || 0;
       const imageInput = document.getElementById('input-product-image');
-
-      if (!name || !priceStr || !imageInput.files[0]) {
+      if (!name || !priceStr || !imageInput.files || !imageInput.files[0]) {
         alert("Bitte alle Felder ausfüllen und ein Bild auswählen.");
         return;
       }
@@ -472,7 +465,6 @@
         alert("Ungültiger Preis!");
         return;
       }
-
       const reader = new FileReader();
       reader.onload = async (evt) => {
         const imageData = evt.target.result;
@@ -495,11 +487,9 @@
     function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
       listDiv.innerHTML = "";
-
       selectedProducts.forEach((product, index) => {
         const prodDiv = document.createElement('div');
         prodDiv.classList.add('product-card');
-
         let html = "";
         if (product.imageData) {
           html += `<img class="product-image" src="${product.imageData}" alt="${product.name}">`;
@@ -569,7 +559,6 @@
       const summaryDiv = document.getElementById('order-summary');
       let html = "";
       const filteredOrders = orders.filter(o => o.clientIP === clientIP);
-
       filteredOrders.forEach((order, idx) => {
         html += `<h3>Bestellung ${idx+1}</h3>
                  <table class="order-table">
@@ -604,7 +593,6 @@
                  <p><strong>Gesamtpunkte:</strong> ${order.totalPoints}</p>
                  <hr>`;
       });
-
       if (filteredOrders.length === 0) {
         html = "<p>Es wurden noch keine Bestellungen von Ihrer IP aufgezeichnet.</p>";
       }
@@ -617,10 +605,9 @@
       showScreen("screen-kundendaten");
     });
 
-    // Neuer Event Listener: Alte Bestellungen löschen
+    // Alte Bestellungen löschen
     document.getElementById('btn-clear-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich alle alten Bestellungen löschen?")) {
-        // Lösche alle Bestellungen, die der aktuellen IP zugeordnet sind
         orders = orders.filter(o => o.clientIP !== clientIP);
         localStorage.setItem('orders', JSON.stringify(orders));
         renderOrderSummary();

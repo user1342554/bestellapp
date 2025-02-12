@@ -1,5 +1,14 @@
 import faunadb from "faunadb";
 
+// Dummy-Implementierung für localStorage, falls nicht vorhanden (Node-Kontext)
+if (typeof localStorage === 'undefined') {
+  global.localStorage = {
+    getItem() { return null; },
+    setItem() { },
+    removeItem() { }
+  };
+}
+
 // Den FaunaDB-Client instanziieren
 const client = new faunadb.Client({
   secret: process.env.FAUNA_SECRET,

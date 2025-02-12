@@ -1,24 +1,23 @@
 {
-    "name": "bestellapp",
-    "version": "1.0.0",
-    "description": "DSC Offenbach Bestell App",
-    "main": "index.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/eddyjunge/bestellapp.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "type": "module",
-    "engines": {
-      "node": "16.x"
-    },
-    "dependencies": {
-      "faunadb": "^4.8.2"
-    }
+  "name": "bestellapp",
+  "version": "1.0.0",
+  "description": "DSC Offenbach Bestell App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eddyjunge/bestellapp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "engines": {
+    "node": "16.x"
+  },
+  "dependencies": {
+    "faunadb": "^4.8.2"
   }
-  
+}
