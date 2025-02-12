@@ -2,41 +2,62 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Minimalistische Web App</title>
+  <title>Minimalistische Web App - Modernes Design</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- SheetJS (xlsx) einbinden -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    /* Globales CSS */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* CSS Reset & globale Variablen */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --primary-color: #007aff;
+      --secondary-color: #005bb5;
+      --accent-color: #e74c3c;
+      --background-color: #f7f7f7;
+      --card-background: #ffffff;
+      --text-color: #333;
+      --border-color: #ddd;
+      --hover-bg: #e0e0e0;
+      --font-family: 'Roboto', sans-serif;
+    }
     body {
-      font-family: "Roboto", sans-serif;
-      background-color: #f7f7f7;
-      color: #333;
+      font-family: var(--font-family);
+      background-color: var(--background-color);
+      color: var(--text-color);
       -webkit-font-smoothing: antialiased;
       line-height: 1.5;
-      padding: 10px;
+      padding: 20px;
     }
     .container {
       max-width: 600px;
       margin: 30px auto;
-      background: #fff;
+      background: var(--card-background);
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 20px;
-      position: relative;
       overflow: hidden;
     }
+    /* Screens mit Fade-In-Effekt */
     .screen {
       display: none;
       opacity: 0;
       transform: translateY(20px);
       animation: fadeIn 0.4s forwards;
     }
-    .screen.active { display: block; }
-    @keyframes fadeIn {
-      to { opacity: 1; transform: translateY(0); }
+    .screen.active {
+      display: block;
     }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Header & Navigation */
     .header {
       display: flex;
       align-items: center;
@@ -45,33 +66,41 @@
     .back-button {
       background: none;
       border: none;
-      color: #007aff;
+      color: var(--primary-color);
       font-size: 16px;
       cursor: pointer;
       padding: 8px;
       transition: color 0.3s;
     }
-    .back-button:disabled { color: #ccc; cursor: default; }
+    .back-button:disabled {
+      color: #ccc;
+      cursor: default;
+    }
     .title {
       flex-grow: 1;
       text-align: center;
       font-size: 24px;
       font-weight: 600;
     }
+    /* Formularfelder */
     input[type="text"],
     input[type="email"],
     input[type="password"],
     input[type="number"],
     input[type="tel"] {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 16px;
       transition: border-color 0.3s;
     }
-    input:focus { border-color: #007aff; outline: none; }
+    input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    /* Datei-Upload */
     input[type="file"] {
       position: absolute;
       opacity: 0;
@@ -81,37 +110,48 @@
     .label-file {
       display: inline-block;
       padding: 12px 20px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      background-color: #f7f7f7;
-      color: #007aff;
+      background-color: var(--background-color);
+      color: var(--primary-color);
       cursor: pointer;
       transition: background-color 0.3s;
-      margin: 8px 0;
+      margin: 10px 0;
     }
-    .label-file:hover { background-color: #e0e0e0; }
+    .label-file:hover {
+      background-color: var(--hover-bg);
+    }
+    /* Buttons */
     button {
+      display: inline-block;
       padding: 12px 20px;
       border: none;
       border-radius: 8px;
-      background-color: #007aff;
+      background-color: var(--primary-color);
       color: #fff;
       font-size: 16px;
       cursor: pointer;
-      margin: 8px 0;
-      transition: background-color 0.3s, transform 0.2s;
+      margin: 10px 0;
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
     }
-    button:hover { background-color: #005bb5; transform: scale(1.02); }
-    button:active { transform: scale(0.98); }
+    button:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    button:active {
+      transform: translateY(0);
+    }
     .link-button {
       background: none;
       border: none;
-      color: #007aff;
+      color: var(--primary-color);
       font-size: 16px;
       cursor: pointer;
       text-decoration: underline;
       padding: 0;
     }
+    /* Footer */
     .footer {
       text-align: center;
       font-size: 12px;
@@ -120,34 +160,37 @@
       cursor: pointer;
       transition: color 0.3s;
     }
-    .footer:hover { color: #007aff; }
+    .footer:hover {
+      color: var(--primary-color);
+    }
+    /* Produktkarten */
     .product-card {
       border: 1px solid #eee;
       border-radius: 12px;
-      padding: 12px;
-      background: #fff;
+      padding: 14px;
+      background: var(--card-background);
       display: flex;
       flex-direction: column;
       align-items: center;
       transition: transform 0.3s, box-shadow 0.3s;
-      margin-bottom: 10px;
+      margin-bottom: 16px;
     }
     .product-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     }
     .product-image {
       width: 100%;
-      max-height: 100px;
+      max-height: 120px;
       object-fit: cover;
       border-radius: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     .product-description {
       font-size: 14px;
       color: #555;
       font-style: italic;
-      margin-top: 4px;
+      margin-top: 6px;
       text-align: center;
     }
     #produkt-list {
@@ -156,45 +199,56 @@
       gap: 16px;
     }
     @media (max-width: 480px) {
-      #produkt-list { grid-template-columns: repeat(2, 1fr); }
-      .title { font-size: 20px; }
-      button { font-size: 14px; }
+      #produkt-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .title {
+        font-size: 20px;
+      }
+      button {
+        font-size: 14px;
+      }
     }
-    /* Tabelle für Bestellübersicht */
+    /* Tabellen-Stile */
     .order-table {
       width: 100%;
       border-collapse: collapse;
       margin: 10px 0;
       font-size: 14px;
-      table-layout: fixed;
-      word-wrap: break-word;
     }
     .order-table th, .order-table td {
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
       padding: 8px;
       text-align: left;
     }
-    .order-table th { background-color: #f2f2f2; }
-    /* Styles für Bestell-Accordion */
+    .order-table th {
+      background-color: #f2f2f2;
+    }
+    /* Akkordeon für Bestellungen */
     .order-item {
-      border: 1px solid #ddd;
-      margin: 10px 0;
-      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      margin: 12px 0;
+      border-radius: 8px;
       overflow: hidden;
     }
     .order-header {
-      background-color: #f2f2f2;
-      padding: 8px;
+      background-color: #f9f9f9;
+      padding: 10px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: background-color 0.3s;
+    }
+    .order-header:hover {
+      background-color: #f2f2f2;
     }
     .order-details {
-      padding: 8px;
+      padding: 10px;
       display: none;
+      background-color: #fff;
     }
-    /* Neuer, moderner Löschen-Button (Trash-Icon) */
+    /* Moderner Löschen-Button (Trash-Icon) */
     .delete-order-btn {
       background: transparent;
       border: none;
@@ -205,7 +259,7 @@
     .delete-order-btn svg {
       width: 20px;
       height: 20px;
-      fill: #e74c3c;
+      fill: var(--accent-color);
       transition: fill 0.3s, transform 0.2s;
     }
     .delete-order-btn:hover svg {
@@ -215,9 +269,9 @@
     .delete-order-btn:active svg {
       transform: scale(0.95);
     }
-    /* Neuer Stil für den Button "Alle Bestellungen löschen" */
+    /* "Alle Bestellungen löschen"-Button */
     #btn-clear-all-orders {
-      background-color: #e74c3c;
+      background-color: var(--accent-color);
       color: #fff;
       border: none;
       padding: 12px 20px;
@@ -228,29 +282,36 @@
     }
     #btn-clear-all-orders:hover {
       background-color: #c0392b;
-      transform: scale(1.02);
+      transform: translateY(-2px);
     }
     #btn-clear-all-orders:active {
-      transform: scale(0.98);
+      transform: translateY(0);
     }
+    /* Modale Dialoge */
     .modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.6);
       display: none;
       align-items: center;
       justify-content: center;
       animation: fadeIn 0.4s;
       z-index: 1000;
     }
-    .modal.active { display: flex; }
+    .modal.active {
+      display: flex;
+    }
     .modal-content {
-      background: #fff;
+      background: var(--card-background);
       padding: 20px;
       border-radius: 12px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    /* Zusätzliche visuelle Rückmeldung bei ungültigen Eingaben */
+    input:invalid {
+      border-color: var(--accent-color);
     }
   </style>
 </head>
@@ -293,7 +354,7 @@
       <button id="btn-show-change-password" style="background-color:#555;">Passwort ändern</button>
       <div id="operator-products-list"></div>
       <button id="btn-show-add-product">+ Neues Produkt hinzufügen</button>
-      <!-- Produkt hinzufügen: Zusätzliches Feld für optionale Beschreibung -->
+      <!-- Formular: Neues Produkt hinzufügen -->
       <div id="add-product-form" style="display:none;">
         <h3>Neues Produkt</h3>
         <form id="form-add-product">
@@ -338,10 +399,9 @@
         <div class="title">Bestellübersicht</div>
       </div>
       <div id="order-summary"></div>
-      <!-- Button für Excel-Export -->
+      <!-- Excel-Export & weitere Aktionen -->
       <button id="btn-export-excel">Bestellungen als Excel exportieren</button>
       <button id="btn-new-order">Neue Bestellung</button>
-      <!-- Neuer Knopf: Alle Bestellungen löschen -->
       <button id="btn-clear-all-orders">Alle Bestellungen löschen</button>
       <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
     </div>
@@ -546,7 +606,6 @@
       const reader = new FileReader();
       reader.onload = async (evt) => {
         const imageData = evt.target.result;
-        // Neues Produktobjekt inklusive Beschreibung
         const newProduct = { name, price, points, description, imageData };
         try {
           const savedProduct = await addProduct(newProduct);
@@ -620,7 +679,6 @@
           totalPrice += p.price * p.quantity;
           totalPoints += p.points * p.quantity;
         });
-        // Bestellung mit Zeitstempel
         const order = {
           customer: currentCustomer,
           products: selectedOrder,
@@ -663,7 +721,6 @@
         const headerText = document.createElement('span');
         headerText.textContent = `Bestellung vom ${dateStr}`;
         
-        // Neuer moderner Löschen-Button mit Trash-Icon (SVG)
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add('delete-order-btn');
         deleteBtn.setAttribute("aria-label", "Bestellung löschen");
@@ -673,7 +730,7 @@
           </svg>
         `;
         deleteBtn.addEventListener('click', (event) => {
-          event.stopPropagation(); // Verhindert das Toggle des Akkordeons
+          event.stopPropagation();
           if (confirm("Diese Bestellung wirklich löschen?")) {
             orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
             localStorage.setItem('orders', JSON.stringify(orders));
@@ -734,7 +791,7 @@
       showScreen("screen-kundendaten");
     });
     
-    // Knopf: Alle Bestellungen löschen
+    // Alle Bestellungen löschen
     document.getElementById('btn-clear-all-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich ALLE Bestellungen löschen?")) {
         orders = [];
@@ -743,7 +800,7 @@
       }
     });
     
-    // Exportiere Bestellungen als Excel-Datei mit SheetJS
+    // Export als Excel mit SheetJS
     function exportOrdersToExcel() {
       const filteredOrders = orders.filter(o => o.clientIP === clientIP);
       if (filteredOrders.length === 0) {
