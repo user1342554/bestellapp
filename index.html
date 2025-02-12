@@ -536,7 +536,11 @@
       e.preventDefault();
       const inputPass = document.getElementById('input-operator-password').value;
       if (inputPass === operatorPassword) {
-        await renderOperatorProducts();
+        // Falls bereits Produkte im lokalen Array vorhanden sind (z. B. durch Import), laden wir nicht neu vom Server.
+        if (products.length === 0) {
+          await loadProducts();
+        }
+        renderOperatorProducts();
         showScreen("screen-operator-dashboard");
       } else {
         alert("Ungültiges Passwort.");
@@ -604,8 +608,11 @@
       }
     }
 
+    // Angepasst: Nur wenn das lokale Array leer ist, wird vom Server geladen.
     async function renderOperatorProducts() {
-      await loadProducts();
+      if (products.length === 0) {
+        await loadProducts();
+      }
       const listDiv = document.getElementById('operator-products-list');
       listDiv.innerHTML = "";
       products.forEach((product, index) => {
