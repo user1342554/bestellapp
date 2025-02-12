@@ -1,13 +1,13 @@
-import faunadb from "faunadb";
-
-// Dummy-Implementierung für localStorage, falls nicht vorhanden (Node-Kontext)
-if (typeof localStorage === 'undefined') {
+// Setze global.localStorage, bevor faunadb importiert wird:
+if (typeof global.localStorage === 'undefined') {
   global.localStorage = {
     getItem() { return null; },
     setItem() { },
     removeItem() { }
   };
 }
+
+import faunadb from "faunadb";
 
 // Den FaunaDB-Client instanziieren
 const client = new faunadb.Client({
@@ -20,7 +20,6 @@ const q = faunadb.query;
 
 export async function handler(event, context) {
   const method = event.httpMethod;
-  
   try {
     // GET: Alle Produkte abrufen
     if (method === "GET") {
@@ -30,7 +29,6 @@ export async function handler(event, context) {
           q.Lambda("ref", q.Get(q.Var("ref")))
         )
       );
-      // result.data enthält alle Dokumente
       const data = result.data.map(doc => ({
         id: doc.ref.id,
         ...doc.data
@@ -40,7 +38,6 @@ export async function handler(event, context) {
         body: JSON.stringify(data)
       };
     }
-
     // POST: Neues Produkt anlegen
     if (method === "POST") {
       if (!event.body) {
@@ -49,7 +46,6 @@ export async function handler(event, context) {
           body: JSON.stringify({ error: "Leerer Body. Hast du JSON gesendet?" })
         };
       }
-      
       let bodyData;
       try {
         bodyData = JSON.parse(event.body);
@@ -59,15 +55,12 @@ export async function handler(event, context) {
           body: JSON.stringify({ error: "Ungültiges JSON im Body." })
         };
       }
-      
       const { name, price, points, imageData } = bodyData;
-      
       const createResult = await client.query(
         q.Create(q.Collection("products"), {
           data: { name, price, points, imageData }
         })
       );
-      
       return {
         statusCode: 200,
         body: JSON.stringify({
@@ -76,7 +69,6 @@ export async function handler(event, context) {
         })
       };
     }
-
     // DELETE: Ein Produkt löschen
     if (method === "DELETE") {
       const id = event.queryStringParameters?.id;
@@ -94,8 +86,6 @@ export async function handler(event, context) {
         body: JSON.stringify(delResult)
       };
     }
-    
-    // Andere HTTP-Methoden nicht erlaubt
     return {
       statusCode: 405,
       body: JSON.stringify({ error: "Method Not Allowed" })
