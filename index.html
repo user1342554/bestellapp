@@ -10,7 +10,7 @@
     /* Globales CSS */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "Roboto", sans-serif;
       background-color: #f7f7f7;
       color: #333;
       -webkit-font-smoothing: antialiased;
@@ -130,6 +130,7 @@
       flex-direction: column;
       align-items: center;
       transition: transform 0.3s, box-shadow 0.3s;
+      margin-bottom: 10px;
     }
     .product-card:hover {
       transform: translateY(-3px);
@@ -141,6 +142,13 @@
       object-fit: cover;
       border-radius: 8px;
       margin-bottom: 8px;
+    }
+    .product-description {
+      font-size: 14px;
+      color: #555;
+      font-style: italic;
+      margin-top: 4px;
+      text-align: center;
     }
     #produkt-list {
       display: grid;
@@ -186,18 +194,22 @@
       padding: 8px;
       display: none;
     }
+    /* Neuer, schöner Lösch-Button für einzelne Bestellungen */
     .delete-order-btn {
-      background-color: #dc3545;
+      background-color: #e74c3c;
       color: #fff;
       border: none;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+      line-height: 30px;
+      text-align: center;
       cursor: pointer;
       transition: background-color 0.3s, transform 0.2s;
     }
     .delete-order-btn:hover {
-      background-color: #c82333;
+      background-color: #c0392b;
       transform: scale(1.1);
     }
     .delete-order-btn:active {
@@ -205,7 +217,7 @@
     }
     /* Neuer Stil für den Button "Alle Bestellungen löschen" */
     #btn-clear-all-orders {
-      background-color: #dc3545;
+      background-color: #e74c3c;
       color: #fff;
       border: none;
       padding: 12px 20px;
@@ -215,7 +227,7 @@
       font-size: 16px;
     }
     #btn-clear-all-orders:hover {
-      background-color: #c82333;
+      background-color: #c0392b;
       transform: scale(1.02);
     }
     #btn-clear-all-orders:active {
@@ -281,12 +293,14 @@
       <button id="btn-show-change-password" style="background-color:#555;">Passwort ändern</button>
       <div id="operator-products-list"></div>
       <button id="btn-show-add-product">+ Neues Produkt hinzufügen</button>
+      <!-- Produkt hinzufügen: Zusätzliches Feld für optionale Beschreibung -->
       <div id="add-product-form" style="display:none;">
         <h3>Neues Produkt</h3>
         <form id="form-add-product">
           <input type="text" id="input-product-name" placeholder="Produktname" required>
           <input type="text" id="input-product-price" placeholder="Preis (z.B. 9.99)" required>
           <input type="number" id="input-product-points" placeholder="Punkte (z.B. 10)" value="0">
+          <input type="text" id="input-product-description" placeholder="Produktbeschreibung (optional)">
           <label class="label-file" for="input-product-image">Bild hochladen</label>
           <input type="file" id="input-product-image" accept="image/*">
           <button type="submit">Hinzufügen</button>
@@ -481,8 +495,11 @@
         } else {
           html += `<div style="width:100%;height:100px;background:#eee;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;">Kein Bild</div>`;
         }
-        html += `<strong>${product.name}</strong><br>
-                 Preis: ${parseFloat(product.price).toFixed(2)} €<br>
+        html += `<strong>${product.name}</strong>`;
+        if (product.description) {
+          html += `<div class="product-description">${product.description}</div>`;
+        }
+        html += `<br>Preis: ${parseFloat(product.price).toFixed(2)} €<br>
                  Punkte: ${product.points}<br>`;
         prodDiv.innerHTML = html;
         const removeBtn = document.createElement('button');
@@ -515,9 +532,10 @@
       const name = document.getElementById('input-product-name').value.trim();
       const priceStr = document.getElementById('input-product-price').value.trim().replace(',', '.');
       const points = parseInt(document.getElementById('input-product-points').value.trim()) || 0;
+      const description = document.getElementById('input-product-description').value.trim();
       const imageInput = document.getElementById('input-product-image');
       if (!name || !priceStr || !imageInput.files || !imageInput.files[0]) {
-        alert("Bitte alle Felder ausfüllen und ein Bild auswählen.");
+        alert("Bitte alle erforderlichen Felder ausfüllen und ein Bild auswählen.");
         return;
       }
       const price = parseFloat(priceStr);
@@ -528,7 +546,8 @@
       const reader = new FileReader();
       reader.onload = async (evt) => {
         const imageData = evt.target.result;
-        const newProduct = { name, price, points, imageData };
+        // Neues Produktobjekt inklusive Beschreibung
+        const newProduct = { name, price, points, description, imageData };
         try {
           const savedProduct = await addProduct(newProduct);
           products.push(savedProduct);
@@ -555,8 +574,11 @@
         } else {
           html += `<div style="width:100%;height:80px;background:#eee;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;">Kein Bild</div>`;
         }
-        html += `<strong>${product.name}</strong><br>
-                 <small>${parseFloat(product.price).toFixed(2)} €</small><br>
+        html += `<strong>${product.name}</strong>`;
+        if (product.description) {
+          html += `<div class="product-description">${product.description}</div>`;
+        }
+        html += `<br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
                  <div style="display:flex;justify-content:center;align-items:center;margin-top:8px;">
                    <button style="width:30px;" onclick="decreaseQuantity(${index})">-</button>
                    <span style="margin:0 8px;">${product.quantity}</span>
@@ -598,7 +620,7 @@
           totalPrice += p.price * p.quantity;
           totalPoints += p.points * p.quantity;
         });
-        // Beim Erstellen der Bestellung wird jetzt ein Zeitstempel hinzugefügt.
+        // Bestellung mit Zeitstempel
         const order = {
           customer: currentCustomer,
           products: selectedOrder,
@@ -606,7 +628,7 @@
           totalPrice,
           totalPoints,
           clientIP,
-          timestamp: Date.now()  // Zeitstempel in Millisekunden
+          timestamp: Date.now()
         };
         orders.push(order);
         try {
@@ -629,15 +651,12 @@
         return;
       }
       filteredOrders.forEach(order => {
-        // Konvertiere den Zeitstempel in ein lesbares Datum
         const orderDate = new Date(order.timestamp);
         const dateStr = orderDate.toLocaleString();
         
-        // Container für die Bestellung
         const orderItem = document.createElement('div');
         orderItem.classList.add('order-item');
         
-        // Header: Datum und Löschen-Knopf (rotes X)
         const orderHeader = document.createElement('div');
         orderHeader.classList.add('order-header');
         
@@ -646,9 +665,9 @@
         
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add('delete-order-btn');
-        deleteBtn.textContent = "X";
+        deleteBtn.textContent = "×";
         deleteBtn.addEventListener('click', (event) => {
-          event.stopPropagation(); // Verhindert Toggle des Akkordeons
+          event.stopPropagation();
           if (confirm("Diese Bestellung wirklich löschen?")) {
             orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
             localStorage.setItem('orders', JSON.stringify(orders));
@@ -659,7 +678,6 @@
         orderHeader.appendChild(headerText);
         orderHeader.appendChild(deleteBtn);
         
-        // Details-Bereich (collapsible)
         const orderDetails = document.createElement('div');
         orderDetails.classList.add('order-details');
         let detailsHTML = `<table class="order-table">
@@ -694,7 +712,6 @@
           <p><strong>Gesamtpunkte:</strong> ${order.totalPoints}</p>`;
         orderDetails.innerHTML = detailsHTML;
         
-        // Toggle-Event: Klick auf Header toggelt Details
         orderHeader.addEventListener('click', () => {
           orderDetails.style.display = (orderDetails.style.display === "none" || orderDetails.style.display === "") ? "block" : "none";
         });
@@ -711,7 +728,7 @@
       showScreen("screen-kundendaten");
     });
     
-    // Knopf: Alle Bestellungen löschen (löscht sämtliche Bestellungen)
+    // Knopf: Alle Bestellungen löschen
     document.getElementById('btn-clear-all-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich ALLE Bestellungen löschen?")) {
         orders = [];
@@ -728,7 +745,6 @@
         return;
       }
       let rows = [];
-      // Kopfzeile
       rows.push(["Name", "TP-Nummer", "Telefon", "E-Mail", "WeChat ID", "Zahlungsart", "Produkt", "Anzahl", "Preis", "Punkte"]);
       filteredOrders.forEach(order => {
         order.products.forEach(product => {
@@ -748,18 +764,9 @@
       });
       let wb = XLSX.utils.book_new();
       let ws = XLSX.utils.aoa_to_sheet(rows);
-      // Passe Spaltenbreiten an (wch = "character width")
       ws['!cols'] = [
-        { wch: 20 }, // Name
-        { wch: 15 }, // TP-Nummer
-        { wch: 15 }, // Telefon
-        { wch: 25 }, // E-Mail
-        { wch: 20 }, // WeChat ID
-        { wch: 15 }, // Zahlungsart
-        { wch: 20 }, // Produkt
-        { wch: 10 }, // Anzahl
-        { wch: 12 }, // Preis
-        { wch: 10 }  // Punkte
+        { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 20 },
+        { wch: 15 }, { wch: 20 }, { wch: 10 }, { wch: 12 }, { wch: 10 }
       ];
       XLSX.utils.book_append_sheet(wb, ws, "Bestellungen");
       XLSX.writeFile(wb, "bestellungen.xlsx");
