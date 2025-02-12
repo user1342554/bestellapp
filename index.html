@@ -194,25 +194,25 @@
       padding: 8px;
       display: none;
     }
-    /* Neuer, schöner Lösch-Button für einzelne Bestellungen */
+    /* Neuer, moderner Löschen-Button (Trash-Icon) */
     .delete-order-btn {
-      background-color: #e74c3c;
-      color: #fff;
+      background: transparent;
       border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      font-size: 18px;
-      line-height: 30px;
-      text-align: center;
       cursor: pointer;
-      transition: background-color 0.3s, transform 0.2s;
+      padding: 4px;
+      outline: none;
     }
-    .delete-order-btn:hover {
-      background-color: #c0392b;
+    .delete-order-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #e74c3c;
+      transition: fill 0.3s, transform 0.2s;
+    }
+    .delete-order-btn:hover svg {
+      fill: #c0392b;
       transform: scale(1.1);
     }
-    .delete-order-btn:active {
+    .delete-order-btn:active svg {
       transform: scale(0.95);
     }
     /* Neuer Stil für den Button "Alle Bestellungen löschen" */
@@ -499,7 +499,7 @@
         if (product.description) {
           html += `<div class="product-description">${product.description}</div>`;
         }
-        html += `<br>Preis: ${parseFloat(product.price).toFixed(2)} €<br>
+        html += `<br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
                  Punkte: ${product.points}<br>`;
         prodDiv.innerHTML = html;
         const removeBtn = document.createElement('button');
@@ -641,7 +641,7 @@
       });
     });
     
-    // Bestellübersicht als Akkordeon mit Detailanzeige und Einzellösch-Button
+    // Bestellübersicht als Akkordeon mit Detailanzeige und modernem Löschen-Button
     function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
       summaryDiv.innerHTML = "";
@@ -663,11 +663,17 @@
         const headerText = document.createElement('span');
         headerText.textContent = `Bestellung vom ${dateStr}`;
         
+        // Neuer moderner Löschen-Button mit Trash-Icon (SVG)
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add('delete-order-btn');
-        deleteBtn.textContent = "×";
+        deleteBtn.setAttribute("aria-label", "Bestellung löschen");
+        deleteBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6Z"/>
+          </svg>
+        `;
         deleteBtn.addEventListener('click', (event) => {
-          event.stopPropagation();
+          event.stopPropagation(); // Verhindert das Toggle des Akkordeons
           if (confirm("Diese Bestellung wirklich löschen?")) {
             orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
             localStorage.setItem('orders', JSON.stringify(orders));
