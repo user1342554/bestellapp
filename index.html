@@ -186,9 +186,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- Hier folgen alle Screens: Kundendaten, Operator Login, Operator Dashboard, Produktauswahl, Zahlungsart, Bestellübersicht, etc. -->
-    <!-- Für die Vollständigkeit findest du hier ein Beispiel-Skelett – ersetze es ggf. mit deinem vollständigen HTML-Code -->
-    
     <!-- Kundendaten Screen -->
     <div id="screen-kundendaten" class="screen active">
       <div class="header">
@@ -235,7 +232,7 @@
           <input type="text" id="input-product-price" placeholder="Preis (z.B. 9.99)" required>
           <input type="number" id="input-product-points" placeholder="Punkte (z.B. 10)" value="0">
           <label class="label-file" for="input-product-image">Bild hochladen</label>
-          <input type="file" id="input-product-image" accept="image/*" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
+          <input type="file" id="input-product-image" accept="image/*">
           <button type="submit">Hinzufügen</button>
           <button type="button" id="btn-cancel-add-product">Abbrechen</button>
         </form>
@@ -296,8 +293,8 @@
   </div>
   
   <script>
-   /* ------------------ Globale Variablen ------------------ */
-   let operatorPassword = "1234";
+    /* ------------------ Globale Variablen ------------------ */
+    let operatorPassword = "1234";
     let products = [];
     let orders = JSON.parse(localStorage.getItem('orders') || '[]');
     let currentCustomer = {};
@@ -305,6 +302,7 @@
     let selectedOrder = [];
     let clientIP = "";
 
+    // Hole die öffentliche IP (für Demo-Zwecke)
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => { clientIP = data.ip; })
@@ -331,13 +329,14 @@
       }
     }
 
+    // Back-Button-Handler und Footer-Links
     document.querySelectorAll('.back-button').forEach(btn => btn.addEventListener('click', goBack));
     document.querySelectorAll('.footer').forEach(f => {
       f.addEventListener('click', () => { showScreen("screen-operator-login"); });
     });
 
     // Kundendaten-Formular
-    document.getElementById('form-kundendaten').addEventListener('submit', e => {
+    document.getElementById('form-kundendaten').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-name').value.trim();
       const tpNumber = document.getElementById('input-tpNumber').value.trim();
@@ -346,6 +345,9 @@
       const wechatId = document.getElementById('input-wechatId').value.trim();
 
       if (name && tpNumber && phone && email) {
+        // Lade Produkte, bevor die Produktauswahl angezeigt wird
+        await loadProducts();
+
         currentCustomer = { name, tpNumber, phone, email, wechatId, ip: clientIP };
         selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
         renderProduktList();
@@ -486,6 +488,7 @@
       reader.readAsDataURL(imageInput.files[0]);
     });
     
+    // Rendern der Produktauswahl
     function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
       listDiv.innerHTML = "";
@@ -521,6 +524,7 @@
       renderProduktList();
     }
     
+    // Bestellung abschließen
     document.getElementById('btn-submit-order').addEventListener('click', () => {
       const orderProducts = selectedProducts.filter(p => p.quantity > 0);
       if (orderProducts.length === 0) {
@@ -531,6 +535,7 @@
       showScreen("screen-zahlungsart");
     });
     
+    // Zahlungsart auswählen und Bestellung speichern
     document.querySelectorAll('.payment-option').forEach(button => {
       button.addEventListener('click', () => {
         const paymentMethod = button.dataset.method;
@@ -555,6 +560,7 @@
       });
     });
     
+    // Bestellübersicht rendern
     function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
       let html = "";
@@ -599,12 +605,14 @@
       summaryDiv.innerHTML = html;
     }
     
+    // Neue Bestellung starten
     document.getElementById('btn-new-order').addEventListener('click', () => {
       currentCustomer = {};
       selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       showScreen("screen-kundendaten");
     });
     
+    // Alte Bestellungen löschen
     document.getElementById('btn-clear-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich alle alten Bestellungen löschen?")) {
         orders = orders.filter(o => o.clientIP !== clientIP);
@@ -614,6 +622,7 @@
       }
     });
     
+    // Export der Bestellungen als CSV
     document.getElementById('btn-export-excel').addEventListener('click', () => {
       exportOrdersToCSV();
     });
@@ -640,6 +649,7 @@
       document.body.removeChild(link);
     }
     
+    // Passwort ändern Modal
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
       document.getElementById('modal-change-password').classList.add('active');
     });
