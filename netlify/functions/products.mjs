@@ -1,9 +1,9 @@
 import faunadb from "faunadb";
 
-// Den FaunaDB-Client instanziieren und explizit die API-Version auf 3 setzen
+// Den FaunaDB-Client instanziieren
 const client = new faunadb.Client({
-  secret: process.env.FAUNA_SECRET,
-  headers: { "X-FaunaDB-API-Version": "3" },
+  secret: process.env.FAUNA_SECRET
+  // Kein spezieller Header nötig, da in Version 3 standardmäßig FQL v3 genutzt wird.
 });
 
 // Alias für die Query-Funktionen
