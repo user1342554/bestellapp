@@ -506,6 +506,7 @@
       if (name && tpNumber && phone && email) {
         await loadProducts();
         currentCustomer = { name, tpNumber, phone, email, wechatId, ip: clientIP };
+        // Für den Shop-Bereich wird das lokale Array "selectedProducts" gesetzt:
         selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
         renderProduktList();
         showScreen("screen-produktauswahl");
@@ -590,6 +591,7 @@
     }
 
     async function renderOperatorProducts() {
+      // Falls noch keine Produkte geladen wurden, lade sie vom Backend.
       if (products.length === 0) {
         await loadProducts();
       }
@@ -710,6 +712,7 @@
     function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
       listDiv.innerHTML = "";
+      // Die Shop-Anzeige basiert auf selectedProducts.
       selectedProducts.forEach((product, index) => {
         const prodDiv = document.createElement('div');
         prodDiv.classList.add('product-card');
@@ -863,6 +866,7 @@
 
     document.getElementById('btn-new-order').addEventListener('click', () => {
       currentCustomer = {};
+      // Beim Wechsel in den Shop wird selectedProducts aus dem aktuellen products-Array neu gesetzt.
       selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       showScreen("screen-kundendaten");
     });
@@ -931,48 +935,50 @@
       document.getElementById('import-products-input').click();
     });
 
-    // Lese die hochgeladene Datei und speichere die Produkte über addProduct (damit sie im Backend persistiert werden)
+    // Lese die hochgeladene Datei und speichere die Produkte über addProduct,
+    // sodass sie im Backend persistent angelegt werden.
     document.getElementById('import-products-input').addEventListener('change', async function(event) {
       const file = event.target.files[0];
-      if (file) {
-        console.log("Import-Datei ausgewählt:", file.name, file.size, file.type);
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-          const fileContent = e.target.result;
-          console.log("Import-Datei Inhalt (erste 200 Zeichen):", fileContent.substring(0, 200));
-          try {
-            const importedProducts = JSON.parse(fileContent);
-            console.log("Importierte Produkte:", importedProducts);
-            if (Array.isArray(importedProducts)) {
-              // Persistiere jedes importierte Produkt, indem du addProduct aufrufst.
-              for (const importedProduct of importedProducts) {
-                // Entferne ggf. vorhandene id, damit das Backend das Produkt als neu anlegt.
-                if (importedProduct.id) delete importedProduct.id;
-                const addedProduct = await addProduct(importedProduct);
-                products.push(addedProduct);
-              }
-              selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
-              renderOperatorProducts();
-              renderProduktList();
-              alert("Produkte erfolgreich importiert und gespeichert.");
-            } else {
-              alert("Das Format der Datei ist ungültig. Es muss ein Array von Produkten enthalten.");
-            }
-          } catch (error) {
-            alert("Fehler beim Importieren der Produkte: " + error);
-            console.error("JSON-Parsing-Fehler:", error);
-          }
-          // Setze den Input zurück, damit das Change-Event bei erneutem Import ausgelöst wird.
-          event.target.value = "";
-        };
-        reader.onerror = function(e) {
-          console.error("Fehler beim Lesen der Datei:", e);
-          alert("Fehler beim Lesen der Datei.");
-        };
-        reader.readAsText(file);
-      } else {
+      if (!file) {
         alert("Keine Datei ausgewählt.");
+        return;
       }
+      console.log("Import-Datei ausgewählt:", file.name, file.size, file.type);
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const fileContent = e.target.result;
+        console.log("Import-Datei Inhalt (erste 200 Zeichen):", fileContent.substring(0, 200));
+        try {
+          const importedProducts = JSON.parse(fileContent);
+          console.log("Importierte Produkte:", importedProducts);
+          if (Array.isArray(importedProducts)) {
+            // Für jedes importierte Produkt entfernen wir ggf. die vorhandene id und speichern es neu.
+            for (const importedProduct of importedProducts) {
+              if (importedProduct.id) delete importedProduct.id;
+              const addedProduct = await addProduct(importedProduct);
+              console.log("Hinzugefügtes Produkt:", addedProduct);
+              products.push(addedProduct);
+            }
+            // Aktualisiere auch das Array, das im Shop verwendet wird:
+            selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
+            renderOperatorProducts();
+            renderProduktList();
+            alert("Produkte erfolgreich importiert und gespeichert.");
+          } else {
+            alert("Das Format der Datei ist ungültig. Es muss ein Array von Produkten enthalten.");
+          }
+        } catch (error) {
+          alert("Fehler beim Importieren der Produkte: " + error);
+          console.error("JSON-Parsing-Fehler:", error);
+        }
+        // Setze den Input zurück, damit ein erneutes Import-Event ausgelöst werden kann.
+        event.target.value = "";
+      };
+      reader.onerror = function(e) {
+        console.error("Fehler beim Lesen der Datei:", e);
+        alert("Fehler beim Lesen der Datei.");
+      };
+      reader.readAsText(file);
     });
 
     /* ------------------ Modal: Passwort ändern ------------------ */
