@@ -152,7 +152,7 @@
       .title { font-size: 20px; }
       button { font-size: 14px; }
     }
-    /* Verbesserte Tabelle für Bestellübersicht */
+    /* Tabelle für Bestellübersicht */
     .order-table {
       width: 100%;
       border-collapse: collapse;
@@ -167,6 +167,34 @@
       text-align: left;
     }
     .order-table th { background-color: #f2f2f2; }
+    /* Styles für Bestell-Accordion */
+    .order-item {
+      border: 1px solid #ddd;
+      margin: 10px 0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .order-header {
+      background-color: #f2f2f2;
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .order-details {
+      padding: 8px;
+      display: none;
+    }
+    .delete-order-btn {
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
     .modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -206,7 +234,6 @@
       </form>
       <div class="footer" id="footer-kundendaten">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Operator Login Screen -->
     <div id="screen-operator-login" class="screen">
       <div class="header">
@@ -219,7 +246,6 @@
       </form>
       <div class="footer" id="footer-operator-login">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Operator Dashboard Screen -->
     <div id="screen-operator-dashboard" class="screen">
       <div class="header">
@@ -243,7 +269,6 @@
       </div>
       <div class="footer" id="footer-operator-dashboard">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Produktauswahl Screen -->
     <div id="screen-produktauswahl" class="screen">
       <div class="header">
@@ -254,7 +279,6 @@
       <button id="btn-submit-order">Bestellung abschließen</button>
       <div class="footer" id="footer-produktauswahl">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Zahlungsart Screen -->
     <div id="screen-zahlungsart" class="screen">
       <div class="header">
@@ -267,7 +291,6 @@
       <button class="payment-option" data-method="Überweisung">Überweisung</button>
       <div class="footer" id="footer-zahlungsart">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Bestellübersicht Screen -->
     <div id="screen-bestelluebersicht" class="screen">
       <div class="header">
@@ -278,12 +301,11 @@
       <!-- Button für Excel-Export -->
       <button id="btn-export-excel">Bestellungen als Excel exportieren</button>
       <button id="btn-new-order">Neue Bestellung</button>
-      <!-- Der folgende Knopf löscht nur Bestellungen, die älter als 1 Stunde (3600000 ms) sind -->
-      <button id="btn-clear-orders">Alte Bestellungen löschen</button>
+      <!-- Neuer Knopf: Alle Bestellungen löschen -->
+      <button id="btn-clear-all-orders">Alle Bestellungen löschen</button>
       <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
     </div>
   </div>
-  
   <!-- Modal: Passwort ändern -->
   <div id="modal-change-password" class="modal">
     <div class="modal-content">
@@ -297,7 +319,6 @@
       </form>
     </div>
   </div>
-  
   <script>
     /* ------------------ Globale Variablen ------------------ */
     let operatorPassword = "1234";
@@ -551,7 +572,7 @@
           totalPrice += p.price * p.quantity;
           totalPoints += p.points * p.quantity;
         });
-        // Beim Speichern der Bestellung wird nun auch ein Zeitstempel (createdAt) gesetzt
+        // Beim Erstellen der Bestellung wird jetzt ein Zeitstempel hinzugefügt.
         const order = {
           customer: currentCustomer,
           products: selectedOrder,
@@ -559,7 +580,7 @@
           totalPrice,
           totalPoints,
           clientIP,
-          createdAt: Date.now()
+          timestamp: Date.now()  // Zeitstempel in Millisekunden
         };
         orders.push(order);
         try {
@@ -572,68 +593,106 @@
       });
     });
     
+    // Neue Version von renderOrderSummary mit collapsiblen Bestellungen und Löschen einzelner Orders
     function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
-      let html = "";
+      summaryDiv.innerHTML = "";
       const filteredOrders = orders.filter(o => o.clientIP === clientIP);
-      filteredOrders.forEach((order, idx) => {
-        html += `<h3>Bestellung ${idx+1}</h3>
-                 <table class="order-table">
-                   <tr><th>Feld</th><th>Wert</th></tr>
-                   <tr><td>Name</td><td>${order.customer.name}</td></tr>
-                   <tr><td>TP-Nummer</td><td>${order.customer.tpNumber}</td></tr>
-                   <tr><td>Telefon</td><td>${order.customer.phone}</td></tr>
-                   <tr><td>E-Mail</td><td>${order.customer.email}</td></tr>`;
-        if (order.customer.wechatId) {
-          html += `<tr><td>WeChat ID</td><td>${order.customer.wechatId}</td></tr>`;
-        }
-        html += `<tr><td>Zahlungsart</td><td>${order.paymentMethod}</td></tr>
-                 </table>
-                 <h4>Produkte</h4>
-                 <table class="order-table">
-                   <tr>
-                     <th>Produkt</th>
-                     <th>Menge</th>
-                     <th>Preis</th>
-                     <th>Punkte</th>
-                   </tr>`;
-        order.products.forEach(p => {
-          html += `<tr>
-                     <td>${p.name}</td>
-                     <td>${p.quantity}</td>
-                     <td>${parseFloat(p.price).toFixed(2)} €</td>
-                     <td>${p.points}</td>
-                   </tr>`;
-        });
-        html += `</table>
-                 <p><strong>Gesamtsumme:</strong> ${parseFloat(order.totalPrice).toFixed(2)} €</p>
-                 <p><strong>Gesamtpunkte:</strong> ${order.totalPoints}</p>
-                 <hr>`;
-      });
       if (filteredOrders.length === 0) {
-        html = "<p>Es wurden noch keine Bestellungen von Ihrer IP aufgezeichnet.</p>";
+        summaryDiv.innerHTML = "<p>Es wurden noch keine Bestellungen von Ihrer IP aufgezeichnet.</p>";
+        return;
       }
-      summaryDiv.innerHTML = html;
+      filteredOrders.forEach(order => {
+        // Konvertiere den Zeitstempel in ein lesbares Datum
+        const orderDate = new Date(order.timestamp);
+        const dateStr = orderDate.toLocaleString();
+        
+        // Erstelle einen Container für die Bestellung
+        const orderItem = document.createElement('div');
+        orderItem.classList.add('order-item');
+        
+        // Header: Datum und Löschen-Knopf (rotes X)
+        const orderHeader = document.createElement('div');
+        orderHeader.classList.add('order-header');
+        
+        const headerText = document.createElement('span');
+        headerText.textContent = `Bestellung vom ${dateStr}`;
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('delete-order-btn');
+        deleteBtn.textContent = "X";
+        deleteBtn.addEventListener('click', (event) => {
+          event.stopPropagation(); // Verhindert, dass das Akkordeon getoggelt wird
+          if (confirm("Diese Bestellung wirklich löschen?")) {
+            // Entferne die Bestellung aus dem orders-Array (über den Zeitstempel und clientIP)
+            orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
+            localStorage.setItem('orders', JSON.stringify(orders));
+            renderOrderSummary();
+          }
+        });
+        
+        orderHeader.appendChild(headerText);
+        orderHeader.appendChild(deleteBtn);
+        
+        // Details-Bereich (collapsible)
+        const orderDetails = document.createElement('div');
+        orderDetails.classList.add('order-details');
+        let detailsHTML = `<table class="order-table">
+          <tr><th>Feld</th><th>Wert</th></tr>
+          <tr><td>Name</td><td>${order.customer.name}</td></tr>
+          <tr><td>TP-Nummer</td><td>${order.customer.tpNumber}</td></tr>
+          <tr><td>Telefon</td><td>${order.customer.phone}</td></tr>
+          <tr><td>E-Mail</td><td>${order.customer.email}</td></tr>`;
+        if (order.customer.wechatId) {
+          detailsHTML += `<tr><td>WeChat ID</td><td>${order.customer.wechatId}</td></tr>`;
+        }
+        detailsHTML += `<tr><td>Zahlungsart</td><td>${order.paymentMethod}</td></tr>
+          </table>
+          <h4>Produkte</h4>
+          <table class="order-table">
+            <tr>
+              <th>Produkt</th>
+              <th>Menge</th>
+              <th>Preis</th>
+              <th>Punkte</th>
+            </tr>`;
+        order.products.forEach(p => {
+          detailsHTML += `<tr>
+                            <td>${p.name}</td>
+                            <td>${p.quantity}</td>
+                            <td>${parseFloat(p.price).toFixed(2)} €</td>
+                            <td>${p.points}</td>
+                          </tr>`;
+        });
+        detailsHTML += `</table>
+          <p><strong>Gesamtsumme:</strong> ${parseFloat(order.totalPrice).toFixed(2)} €</p>
+          <p><strong>Gesamtpunkte:</strong> ${order.totalPoints}</p>`;
+        orderDetails.innerHTML = detailsHTML;
+        
+        // Toggle-Event: Klick auf Header schaltet Details ein/aus
+        orderHeader.addEventListener('click', () => {
+          orderDetails.style.display = (orderDetails.style.display === "none" || orderDetails.style.display === "") ? "block" : "none";
+        });
+        
+        orderItem.appendChild(orderHeader);
+        orderItem.appendChild(orderDetails);
+        summaryDiv.appendChild(orderItem);
+      });
     }
     
+    // Knopf: Neue Bestellung (bleibt unverändert)
     document.getElementById('btn-new-order').addEventListener('click', () => {
       currentCustomer = {};
       selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       showScreen("screen-kundendaten");
     });
     
-    // Hier wird nur eine Bestellung gelöscht, wenn sie älter als 1 Stunde (3600000 ms) ist.
-    document.getElementById('btn-clear-orders').addEventListener('click', () => {
-      const threshold = 3600000; // 1 Stunde in Millisekunden
-      if (confirm("Möchtest du wirklich alle alten Bestellungen löschen?")) {
-        orders = orders.filter(o => !(o.clientIP === clientIP && (Date.now() - o.createdAt > threshold)));
-        try {
-          localStorage.setItem('orders', JSON.stringify(orders));
-        } catch (e) {
-          console.error("Fehler beim Aktualisieren des localStorage:", e);
-        }
+    // Neuer Knopf: Alle Bestellungen löschen (löscht sämtliche Bestellungen)
+    document.getElementById('btn-clear-all-orders').addEventListener('click', () => {
+      if (confirm("Möchtest du wirklich ALLE Bestellungen löschen?")) {
+        orders = [];
+        localStorage.setItem('orders', JSON.stringify(orders));
         renderOrderSummary();
-        alert("Alte Bestellungen wurden gelöscht.");
       }
     });
     
