@@ -206,6 +206,7 @@
       </form>
       <div class="footer" id="footer-kundendaten">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Operator Login Screen -->
     <div id="screen-operator-login" class="screen">
       <div class="header">
@@ -218,6 +219,7 @@
       </form>
       <div class="footer" id="footer-operator-login">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Operator Dashboard Screen -->
     <div id="screen-operator-dashboard" class="screen">
       <div class="header">
@@ -241,6 +243,7 @@
       </div>
       <div class="footer" id="footer-operator-dashboard">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Produktauswahl Screen -->
     <div id="screen-produktauswahl" class="screen">
       <div class="header">
@@ -251,6 +254,7 @@
       <button id="btn-submit-order">Bestellung abschließen</button>
       <div class="footer" id="footer-produktauswahl">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Zahlungsart Screen -->
     <div id="screen-zahlungsart" class="screen">
       <div class="header">
@@ -263,6 +267,7 @@
       <button class="payment-option" data-method="Überweisung">Überweisung</button>
       <div class="footer" id="footer-zahlungsart">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Bestellübersicht Screen -->
     <div id="screen-bestelluebersicht" class="screen">
       <div class="header">
@@ -273,10 +278,12 @@
       <!-- Button für Excel-Export -->
       <button id="btn-export-excel">Bestellungen als Excel exportieren</button>
       <button id="btn-new-order">Neue Bestellung</button>
+      <!-- Der folgende Knopf löscht nur Bestellungen, die älter als 1 Stunde (3600000 ms) sind -->
       <button id="btn-clear-orders">Alte Bestellungen löschen</button>
       <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
     </div>
   </div>
+  
   <!-- Modal: Passwort ändern -->
   <div id="modal-change-password" class="modal">
     <div class="modal-content">
@@ -290,6 +297,7 @@
       </form>
     </div>
   </div>
+  
   <script>
     /* ------------------ Globale Variablen ------------------ */
     let operatorPassword = "1234";
@@ -543,13 +551,15 @@
           totalPrice += p.price * p.quantity;
           totalPoints += p.points * p.quantity;
         });
+        // Beim Speichern der Bestellung wird nun auch ein Zeitstempel (createdAt) gesetzt
         const order = {
           customer: currentCustomer,
           products: selectedOrder,
           paymentMethod,
           totalPrice,
           totalPoints,
-          clientIP
+          clientIP,
+          createdAt: Date.now()
         };
         orders.push(order);
         try {
@@ -612,9 +622,11 @@
       showScreen("screen-kundendaten");
     });
     
+    // Hier wird nur eine Bestellung gelöscht, wenn sie älter als 1 Stunde (3600000 ms) ist.
     document.getElementById('btn-clear-orders').addEventListener('click', () => {
+      const threshold = 3600000; // 1 Stunde in Millisekunden
       if (confirm("Möchtest du wirklich alle alten Bestellungen löschen?")) {
-        orders = orders.filter(o => o.clientIP !== clientIP);
+        orders = orders.filter(o => !(o.clientIP === clientIP && (Date.now() - o.createdAt > threshold)));
         try {
           localStorage.setItem('orders', JSON.stringify(orders));
         } catch (e) {
