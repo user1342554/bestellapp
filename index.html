@@ -5,7 +5,7 @@
   <title>Minimalistische Web App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ----- Dein bestehendes CSS ----- */
+    /* Globales CSS */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -59,7 +59,8 @@
     input[type="text"],
     input[type="email"],
     input[type="password"],
-    input[type="number"] {
+    input[type="number"],
+    input[type="tel"] {
       width: 100%;
       padding: 12px;
       margin: 8px 0;
@@ -69,7 +70,6 @@
       transition: border-color 0.3s;
     }
     input:focus { border-color: #007aff; outline: none; }
-    /* Den File-Input nicht per display:none; ausblenden, sondern so, dass er unsichtbar, aber fokussierbar bleibt */
     input[type="file"] {
       position: absolute;
       opacity: 0;
@@ -150,17 +150,19 @@
       .title { font-size: 20px; }
       button { font-size: 14px; }
     }
+    /* Verbesserte Tabelle für Bestellübersicht */
     .order-table {
       width: 100%;
       border-collapse: collapse;
       margin: 10px 0;
       font-size: 14px;
+      table-layout: fixed;
+      word-wrap: break-word;
     }
     .order-table th, .order-table td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: left;
-      white-space: nowrap;
     }
     .order-table th { background-color: #f2f2f2; }
     .modal {
@@ -195,7 +197,7 @@
       <form id="form-kundendaten">
         <input type="text" id="input-name" placeholder="Vollständiger Name" required>
         <input type="text" id="input-tpNumber" placeholder="TP-Nummer" required>
-        <input type="text" id="input-phone" placeholder="Telefonnummer" required>
+        <input type="tel" id="input-phone" placeholder="Telefonnummer" required>
         <input type="email" id="input-email" placeholder="E-Mail" required>
         <input type="text" id="input-wechatId" placeholder="WeChat ID (optional)">
         <button type="submit">Weiter zur Produktauswahl</button>
@@ -296,7 +298,6 @@
     /* ------------------ Globale Variablen ------------------ */
     let operatorPassword = "1234";
     let products = [];
-    // Zugriff auf localStorage in try/catch, um Fehler (z. B. im file://‑Kontext) abzufangen
     let orders = [];
     try {
       orders = JSON.parse(localStorage.getItem('orders') || '[]');
@@ -309,7 +310,6 @@
     let selectedOrder = [];
     let clientIP = "";
 
-    // Hole die öffentliche IP (für Demo-Zwecke)
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => { clientIP = data.ip; })
@@ -336,13 +336,11 @@
       }
     }
 
-    // Back-Button-Handler und Footer-Links
     document.querySelectorAll('.back-button').forEach(btn => btn.addEventListener('click', goBack));
     document.querySelectorAll('.footer').forEach(f => {
       f.addEventListener('click', () => { showScreen("screen-operator-login"); });
     });
 
-    // Kundendaten-Formular
     document.getElementById('form-kundendaten').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-name').value.trim();
@@ -352,9 +350,7 @@
       const wechatId = document.getElementById('input-wechatId').value.trim();
 
       if (name && tpNumber && phone && email) {
-        // Lade Produkte, bevor die Produktauswahl angezeigt wird
         await loadProducts();
-
         currentCustomer = { name, tpNumber, phone, email, wechatId, ip: clientIP };
         selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
         renderProduktList();
@@ -364,7 +360,6 @@
       }
     });
 
-    // Operator Login
     document.getElementById('form-operator-login').addEventListener('submit', async e => {
       e.preventDefault();
       const inputPass = document.getElementById('input-operator-password').value;
@@ -376,7 +371,6 @@
       }
     });
 
-    // Produkte laden (Netlify Functions)
     async function loadProducts() {
       try {
         const res = await fetch('/.netlify/functions/products');
@@ -395,7 +389,6 @@
       }
     }
 
-    // Produkt hinzufügen (Netlify Functions)
     async function addProduct(newProduct) {
       try {
         const response = await fetch('/.netlify/functions/products', {
@@ -411,7 +404,6 @@
       }
     }
 
-    // Produkt löschen (Netlify Functions)
     async function deleteProduct(productId) {
       try {
         const response = await fetch(`/.netlify/functions/products?id=${productId}`, {
@@ -425,7 +417,6 @@
       }
     }
 
-    // Operator Dashboard: Produkte anzeigen
     async function renderOperatorProducts() {
       await loadProducts();
       const listDiv = document.getElementById('operator-products-list');
@@ -460,7 +451,6 @@
       });
     }
 
-    // Neues Produkt hinzufügen
     document.getElementById('btn-show-add-product').addEventListener('click', () => {
       document.getElementById('add-product-form').style.display = "block";
     });
@@ -501,7 +491,6 @@
       reader.readAsDataURL(imageInput.files[0]);
     });
     
-    // Rendern der Produktauswahl
     function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
       listDiv.innerHTML = "";
@@ -537,7 +526,6 @@
       renderProduktList();
     }
     
-    // Bestellung abschließen
     document.getElementById('btn-submit-order').addEventListener('click', () => {
       const orderProducts = selectedProducts.filter(p => p.quantity > 0);
       if (orderProducts.length === 0) {
@@ -548,7 +536,6 @@
       showScreen("screen-zahlungsart");
     });
     
-    // Zahlungsart auswählen und Bestellung speichern
     document.querySelectorAll('.payment-option').forEach(button => {
       button.addEventListener('click', () => {
         const paymentMethod = button.dataset.method;
@@ -577,7 +564,6 @@
       });
     });
     
-    // Bestellübersicht rendern
     function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
       let html = "";
@@ -622,14 +608,12 @@
       summaryDiv.innerHTML = html;
     }
     
-    // Neue Bestellung starten
     document.getElementById('btn-new-order').addEventListener('click', () => {
       currentCustomer = {};
       selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       showScreen("screen-kundendaten");
     });
     
-    // Alte Bestellungen löschen
     document.getElementById('btn-clear-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich alle alten Bestellungen löschen?")) {
         orders = orders.filter(o => o.clientIP !== clientIP);
@@ -643,7 +627,6 @@
       }
     });
     
-    // Export der Bestellungen als CSV
     document.getElementById('btn-export-excel').addEventListener('click', () => {
       exportOrdersToCSV();
     });
@@ -658,7 +641,9 @@
       csvContent += `"Name";"TP-Nummer";"Telefon";"E-Mail";"WeChat ID";"Zahlungsart";"Produkt";"Anzahl";"Preis";"Punkte"\n`;
       filteredOrders.forEach(order => {
         order.products.forEach(product => {
-          csvContent += `"${order.customer.name}";"${order.customer.tpNumber}";"${order.customer.phone}";"${order.customer.email}";"${order.customer.wechatId || ""}";"${order.paymentMethod}";"${product.name}";"${product.quantity}";"${product.price}";"${product.points}"\n`;
+          const formattedPrice = parseFloat(product.price).toFixed(2);
+          const tel = "'" + order.customer.phone;
+          csvContent += `"${order.customer.name}";"${order.customer.tpNumber}";"${tel}";"${order.customer.email}";"${order.customer.wechatId || ""}";"${order.paymentMethod}";"${product.name}";"${product.quantity}";"${formattedPrice} €";"${product.points}"\n`;
         });
       });
       const encodedUri = encodeURI(csvContent);
@@ -670,7 +655,6 @@
       document.body.removeChild(link);
     }
     
-    // Passwort ändern Modal
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
       document.getElementById('modal-change-password').classList.add('active');
     });
