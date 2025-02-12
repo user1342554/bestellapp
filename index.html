@@ -47,6 +47,34 @@
       overflow: hidden;
     }
 
+    /* =================== Zentrierte Header =================== */
+    .header {
+      position: relative;
+      padding: 10px 0;
+      text-align: center;
+    }
+    .header .back-button {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 8px;
+      transition: color var(--transition-speed);
+    }
+    .header .back-button:disabled {
+      color: #ccc;
+      cursor: default;
+    }
+    .header .title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
     /* =================== Screens & Animation =================== */
     .screen {
       display: none;
@@ -64,31 +92,7 @@
       }
     }
 
-    /* =================== Header, Buttons & Footer =================== */
-    .header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .back-button {
-      background: none;
-      border: none;
-      color: var(--primary-color);
-      font-size: 16px;
-      cursor: pointer;
-      padding: 8px;
-      transition: color var(--transition-speed);
-    }
-    .back-button:disabled {
-      color: #ccc;
-      cursor: default;
-    }
-    .title {
-      flex-grow: 1;
-      text-align: center;
-      font-size: 24px;
-      font-weight: 600;
-    }
+    /* =================== Buttons, Footer & Links =================== */
     button {
       padding: 12px 20px;
       border: none;
@@ -280,6 +284,21 @@
       transform: scale(0.98);
     }
 
+    /* =================== Export/Import Produkte (Operator-Dashboard) =================== */
+    .export-import-wrapper {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .export-import-wrapper button {
+      background-color: var(--secondary-color);
+    }
+    .export-import-wrapper button:hover {
+      background-color: #444;
+    }
+
     /* =================== Modal (Passwort ändern) =================== */
     .modal {
       position: fixed;
@@ -308,7 +327,7 @@
 
     /* =================== Responsive =================== */
     @media (max-width: 480px) {
-      .title {
+      .header .title {
         font-size: 20px;
       }
       button {
@@ -338,6 +357,7 @@
       </form>
       <div class="footer" id="footer-kundendaten">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Operator Login Screen -->
     <div id="screen-operator-login" class="screen">
       <div class="header">
@@ -350,6 +370,7 @@
       </form>
       <div class="footer" id="footer-operator-login">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Operator Dashboard Screen -->
     <div id="screen-operator-dashboard" class="screen">
       <div class="header">
@@ -357,6 +378,15 @@
         <div class="title">Operator Dashboard</div>
       </div>
       <button id="btn-show-change-password" style="background-color: var(--secondary-color);">Passwort ändern</button>
+      
+      <!-- Export/Import für Produkte -->
+      <div class="export-import-wrapper">
+        <button id="btn-export-products">Produkte exportieren</button>
+        <button id="btn-import-products">Produkte importieren</button>
+        <!-- Verstecktes Input-Feld zum Hochladen -->
+        <input type="file" id="import-products-input" style="display:none;" accept="application/json">
+      </div>
+      
       <div id="operator-products-list"></div>
       <button id="btn-show-add-product">+ Neues Produkt hinzufügen</button>
       <!-- Formular: Produkt hinzufügen -->
@@ -375,6 +405,7 @@
       </div>
       <div class="footer" id="footer-operator-dashboard">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Produktauswahl Screen -->
     <div id="screen-produktauswahl" class="screen">
       <div class="header">
@@ -385,6 +416,7 @@
       <button id="btn-submit-order">Bestellung abschließen</button>
       <div class="footer" id="footer-produktauswahl">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Zahlungsart Screen -->
     <div id="screen-zahlungsart" class="screen">
       <div class="header">
@@ -397,6 +429,7 @@
       <button class="payment-option" data-method="Überweisung">Überweisung</button>
       <div class="footer" id="footer-zahlungsart">PM DSC Offenbach am Main</div>
     </div>
+    
     <!-- Bestellübersicht Screen -->
     <div id="screen-bestelluebersicht" class="screen">
       <div class="header">
@@ -410,6 +443,7 @@
       <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
     </div>
   </div>
+  
   <!-- Modal: Passwort ändern -->
   <div id="modal-change-password" class="modal">
     <div class="modal-content">
@@ -423,6 +457,7 @@
       </form>
     </div>
   </div>
+  
   <script>
     /* ------------------ Globale Variablen & IP-Erfassung ------------------ */
     let operatorPassword = "1234";
@@ -832,6 +867,51 @@
     }
     
     document.getElementById('btn-export-excel').addEventListener('click', exportOrdersToExcel);
+    
+    /* ------------------ Export/Import der Produkte (Operator-Dashboard) ------------------ */
+    // Export: Erstelle aus dem products-Array eine JSON-Datei zum Download
+    document.getElementById('btn-export-products').addEventListener('click', function() {
+      const jsonStr = JSON.stringify(products, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'produkte-template.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+    
+    // Import: Öffnet den Dateidialog
+    document.getElementById('btn-import-products').addEventListener('click', function() {
+      document.getElementById('import-products-input').click();
+    });
+    
+    // Lese die hochgeladene Datei und aktualisiere das Produkt-Array
+    document.getElementById('import-products-input').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const importedProducts = JSON.parse(e.target.result);
+            if (Array.isArray(importedProducts)) {
+              products = importedProducts;
+              selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
+              renderOperatorProducts();
+              renderProduktList();
+              alert("Produkte erfolgreich importiert.");
+            } else {
+              alert("Das Format der Datei ist ungültig.");
+            }
+          } catch (error) {
+            alert("Fehler beim Importieren der Produkte: " + error);
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
     
     /* ------------------ Modal: Passwort ändern ------------------ */
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
