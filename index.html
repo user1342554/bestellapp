@@ -285,7 +285,7 @@
       transform: scale(0.98);
     }
 
-    /* =================== Operator-Aktionsbereich (Passwort, Export/Import) =================== */
+    /* =================== Operator-Aktionsbereich (Passwort ändern, Export/Import) =================== */
     .operator-actions-wrapper {
       display: flex;
       gap: 10px;
@@ -365,7 +365,7 @@
       </form>
       <div class="footer" id="footer-kundendaten">PM DSC Offenbach am Main</div>
     </div>
-    
+
     <!-- Operator Login Screen -->
     <div id="screen-operator-login" class="screen">
       <div class="header">
@@ -378,15 +378,14 @@
       </form>
       <div class="footer" id="footer-operator-login">PM DSC Offenbach am Main</div>
     </div>
-    
+
     <!-- Operator Dashboard Screen -->
     <div id="screen-operator-dashboard" class="screen">
       <div class="header">
         <button class="back-button" id="back-operator-dashboard">&larr; Zurück</button>
         <div class="title">Operator Dashboard</div>
       </div>
-      
-      <!-- Gemeinsamer Aktionsbereich: Passwort ändern + Export/Import -->
+      <!-- Gemeinsamer Aktionsbereich: Passwort ändern, Export/Import -->
       <div class="operator-actions-wrapper">
         <button id="btn-show-change-password" style="background-color: var(--secondary-color);">Passwort ändern</button>
         <div class="export-import-wrapper">
@@ -396,7 +395,6 @@
           <input type="file" id="import-products-input" style="display:none;" accept="application/json">
         </div>
       </div>
-      
       <div id="operator-products-list"></div>
       <button id="btn-show-add-product">+ Neues Produkt hinzufügen</button>
       <!-- Formular: Produkt hinzufügen / bearbeiten -->
@@ -415,7 +413,7 @@
       </div>
       <div class="footer" id="footer-operator-dashboard">PM DSC Offenbach am Main</div>
     </div>
-    
+
     <!-- Produktauswahl Screen -->
     <div id="screen-produktauswahl" class="screen">
       <div class="header">
@@ -426,7 +424,7 @@
       <button id="btn-submit-order">Bestellung abschließen</button>
       <div class="footer" id="footer-produktauswahl">PM DSC Offenbach am Main</div>
     </div>
-    
+
     <!-- Zahlungsart Screen -->
     <div id="screen-zahlungsart" class="screen">
       <div class="header">
@@ -439,7 +437,7 @@
       <button class="payment-option" data-method="Überweisung">Überweisung</button>
       <div class="footer" id="footer-zahlungsart">PM DSC Offenbach am Main</div>
     </div>
-    
+
     <!-- Bestellübersicht Screen -->
     <div id="screen-bestelluebersicht" class="screen">
       <div class="header">
@@ -453,7 +451,7 @@
       <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
     </div>
   </div>
-  
+
   <!-- Modal: Passwort ändern -->
   <div id="modal-change-password" class="modal">
     <div class="modal-content">
@@ -467,7 +465,7 @@
       </form>
     </div>
   </div>
-  
+
   <script>
     /* ------------------ Globale Variablen & IP-Erfassung ------------------ */
     let operatorPassword = "1234";
@@ -483,16 +481,16 @@
     let selectedProducts = [];
     let selectedOrder = [];
     let clientIP = "";
-    let editingProduct = null; // Speichert das aktuell zu bearbeitende Produkt
-    
+    let editingProduct = null; // speichert aktuell zu bearbeitendes Produkt
+
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => { clientIP = data.ip; })
       .catch(() => { clientIP = "unbekannt"; });
-    
+
     let navHistory = [];
     let currentScreen = "screen-kundendaten";
-    
+
     /* ------------------ Navigation & Screen-Wechsel ------------------ */
     function showScreen(screenId, pushHistory = true) {
       if (pushHistory && currentScreen && currentScreen !== screenId) {
@@ -502,7 +500,6 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
     }
-    
     function goBack() {
       if (navHistory.length > 0) {
         const previousScreen = navHistory.pop();
@@ -511,12 +508,11 @@
         document.getElementById(previousScreen).classList.add('active');
       }
     }
-    
     document.querySelectorAll('.back-button').forEach(btn => btn.addEventListener('click', goBack));
     document.querySelectorAll('.footer').forEach(f => {
       f.addEventListener('click', () => { showScreen("screen-operator-login"); });
     });
-    
+
     /* ------------------ Formulare & Produkte laden ------------------ */
     document.getElementById('form-kundendaten').addEventListener('submit', async e => {
       e.preventDefault();
@@ -525,7 +521,6 @@
       const phone = document.getElementById('input-phone').value.trim();
       const email = document.getElementById('input-email').value.trim().toLowerCase();
       const wechatId = document.getElementById('input-wechatId').value.trim();
-    
       if (name && tpNumber && phone && email) {
         await loadProducts();
         currentCustomer = { name, tpNumber, phone, email, wechatId, ip: clientIP };
@@ -536,7 +531,7 @@
         alert("Bitte alle erforderlichen Felder ausfüllen.");
       }
     });
-    
+
     document.getElementById('form-operator-login').addEventListener('submit', async e => {
       e.preventDefault();
       const inputPass = document.getElementById('input-operator-password').value;
@@ -547,7 +542,7 @@
         alert("Ungültiges Passwort.");
       }
     });
-    
+
     async function loadProducts() {
       try {
         const res = await fetch('/.netlify/functions/products');
@@ -565,7 +560,7 @@
         alert("Produkte konnten nicht geladen werden.");
       }
     }
-    
+
     async function addProduct(newProduct) {
       try {
         const response = await fetch('/.netlify/functions/products', {
@@ -580,7 +575,7 @@
         throw err;
       }
     }
-    
+
     async function updateProduct(productId, updatedProduct) {
       try {
         const response = await fetch(`/.netlify/functions/products?id=${productId}`, {
@@ -595,7 +590,7 @@
         throw err;
       }
     }
-    
+
     async function deleteProduct(productId) {
       try {
         const response = await fetch(`/.netlify/functions/products?id=${productId}`, {
@@ -608,7 +603,7 @@
         throw err;
       }
     }
-    
+
     async function renderOperatorProducts() {
       await loadProducts();
       const listDiv = document.getElementById('operator-products-list');
@@ -647,12 +642,10 @@
         editBtn.textContent = "Bearbeiten";
         editBtn.style.backgroundColor = "#FFA500";
         editBtn.addEventListener('click', () => {
-          // Fülle das Formular mit den Daten des zu bearbeitenden Produkts
           document.getElementById('input-product-name').value = product.name;
           document.getElementById('input-product-price').value = product.price;
           document.getElementById('input-product-points').value = product.points;
           document.getElementById('input-product-description').value = product.description || "";
-          // Hinweis: Bild kann nicht vorab geladen werden – ggf. neu auswählen
           editingProduct = { index, product };
           document.getElementById('form-title').textContent = "Produkt bearbeiten";
           document.getElementById('add-product-form').style.display = "block";
@@ -662,19 +655,19 @@
         listDiv.appendChild(prodDiv);
       });
     }
-    
+
     document.getElementById('btn-show-add-product').addEventListener('click', () => {
-      editingProduct = null; // Neu anlegen
+      editingProduct = null;
       document.getElementById('form-add-product').reset();
       document.getElementById('form-title').textContent = "Neues Produkt";
       document.getElementById('add-product-form').style.display = "block";
     });
-    
+
     document.getElementById('btn-cancel-add-product').addEventListener('click', () => {
       document.getElementById('add-product-form').style.display = "none";
       editingProduct = null;
     });
-    
+
     document.getElementById('form-add-product').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-product-name').value.trim();
@@ -691,7 +684,7 @@
         alert("Ungültiger Preis!");
         return;
       }
-      // Funktion, um das Bild (falls ausgewählt) zu lesen
+      // Bild lesen (falls vorhanden)
       const readImage = () => {
         return new Promise((resolve, reject) => {
           if (imageInput.files && imageInput.files[0]) {
@@ -706,18 +699,15 @@
       };
       try {
         const imageData = await readImage();
-        // Neues oder aktualisiertes Produktobjekt
         const productData = { name, price, points, description };
         if (imageData) {
           productData.imageData = imageData;
         }
         if (editingProduct) {
-          // Update des bestehenden Produkts
           const updated = await updateProduct(editingProduct.product.id, productData);
           products[editingProduct.index] = updated;
           editingProduct = null;
         } else {
-          // Neues Produkt hinzufügen
           const savedProduct = await addProduct(productData);
           products.push(savedProduct);
         }
@@ -729,7 +719,7 @@
         alert("Fehler beim Speichern des Produkts.");
       }
     });
-    
+
     function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
       listDiv.innerHTML = "";
@@ -756,19 +746,18 @@
         listDiv.appendChild(prodDiv);
       });
     }
-    
+
     function decreaseQuantity(i) {
       if (selectedProducts[i].quantity > 0) {
         selectedProducts[i].quantity--;
         renderProduktList();
       }
     }
-    
     function increaseQuantity(i) {
       selectedProducts[i].quantity++;
       renderProduktList();
     }
-    
+
     document.getElementById('btn-submit-order').addEventListener('click', () => {
       const orderProducts = selectedProducts.filter(p => p.quantity > 0);
       if (orderProducts.length === 0) {
@@ -778,7 +767,7 @@
       selectedOrder = orderProducts;
       showScreen("screen-zahlungsart");
     });
-    
+
     document.querySelectorAll('.payment-option').forEach(button => {
       button.addEventListener('click', () => {
         const paymentMethod = button.dataset.method;
@@ -807,7 +796,7 @@
         showScreen("screen-bestelluebersicht");
       });
     });
-    
+
     function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
       summaryDiv.innerHTML = "";
@@ -884,13 +873,13 @@
         summaryDiv.appendChild(orderItem);
       });
     }
-    
+
     document.getElementById('btn-new-order').addEventListener('click', () => {
       currentCustomer = {};
       selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       showScreen("screen-kundendaten");
     });
-    
+
     document.getElementById('btn-clear-all-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich ALLE Bestellungen löschen?")) {
         orders = [];
@@ -898,7 +887,7 @@
         renderOrderSummary();
       }
     });
-    
+
     /* ------------------ Export in Excel (SheetJS) ------------------ */
     function exportOrdersToExcel() {
       const filteredOrders = orders.filter(o => o.clientIP === clientIP);
@@ -933,11 +922,10 @@
       XLSX.utils.book_append_sheet(wb, ws, "Bestellungen");
       XLSX.writeFile(wb, "bestellungen.xlsx");
     }
-    
     document.getElementById('btn-export-excel').addEventListener('click', exportOrdersToExcel);
-    
+
     /* ------------------ Export/Import der Produkte (Operator-Dashboard) ------------------ */
-    // Export: Erstelle aus dem products-Array eine JSON-Datei zum Download
+    // Export: Erstelle eine JSON-Datei aus dem products-Array
     document.getElementById('btn-export-products').addEventListener('click', function() {
       const jsonStr = JSON.stringify(products, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -950,20 +938,24 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
-    
+
     // Import: Öffnet den Dateidialog
     document.getElementById('btn-import-products').addEventListener('click', function() {
       document.getElementById('import-products-input').click();
     });
-    
-    // Lese die hochgeladene Datei und aktualisiere das Produkt-Array
+
+    // Lese die hochgeladene Datei und aktualisiere das Produkt-Array (mit erweitertem Debugging)
     document.getElementById('import-products-input').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (file) {
+        console.log("Import-Datei ausgewählt:", file.name, file.size, file.type);
         const reader = new FileReader();
         reader.onload = function(e) {
+          const fileContent = e.target.result;
+          console.log("Import-Datei Inhalt (erste 200 Zeichen):", fileContent.substring(0, 200));
           try {
-            const importedProducts = JSON.parse(e.target.result);
+            const importedProducts = JSON.parse(fileContent);
+            console.log("Importierte Produkte:", importedProducts);
             if (Array.isArray(importedProducts)) {
               products = importedProducts;
               selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
@@ -971,18 +963,25 @@
               renderProduktList();
               alert("Produkte erfolgreich importiert.");
             } else {
-              alert("Das Format der Datei ist ungültig.");
+              alert("Das Format der Datei ist ungültig. Es muss ein Array von Produkten enthalten.");
             }
           } catch (error) {
             alert("Fehler beim Importieren der Produkte: " + error);
+            console.error("JSON-Parsing-Fehler:", error);
           }
-          // Setze den Input zurück, damit bei erneutem Import das Change-Event wieder ausgelöst wird.
+          // Setze den Input zurück, damit das Change-Event bei erneutem Import ausgelöst wird.
           event.target.value = "";
         };
+        reader.onerror = function(e) {
+          console.error("Fehler beim Lesen der Datei:", e);
+          alert("Fehler beim Lesen der Datei.");
+        };
         reader.readAsText(file);
+      } else {
+        alert("Keine Datei ausgewählt.");
       }
     });
-    
+
     /* ------------------ Modal: Passwort ändern ------------------ */
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
       document.getElementById('modal-change-password').classList.add('active');
