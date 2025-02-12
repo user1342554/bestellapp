@@ -5,6 +5,7 @@
   <title>Minimalistische Web App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* ----- Dein bestehendes CSS ----- */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -99,15 +100,6 @@
     }
     button:hover { background-color: #005bb5; transform: scale(1.02); }
     button:active { transform: scale(0.98); }
-    .link-button {
-      background: none;
-      border: none;
-      color: #007aff;
-      font-size: 16px;
-      cursor: pointer;
-      text-decoration: underline;
-      padding: 0;
-    }
     .footer {
       text-align: center;
       font-size: 12px;
@@ -148,46 +140,45 @@
       .title { font-size: 20px; }
       button { font-size: 14px; }
     }
-    .order-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 10px 0;
-      font-size: 14px;
-    }
-    .order-table th, .order-table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-      white-space: nowrap;
-    }
-    .order-table th { background-color: #f2f2f2; }
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.4s;
-      z-index: 1000;
-    }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div id="screen-operator-dashboard" class="screen active">
+    <div id="screen-kundendaten" class="screen active">
       <div class="header">
+        <button class="back-button" id="back-kundendaten" disabled>&larr; Zurück</button>
+        <div class="title">Kundendaten</div>
+      </div>
+      <form id="form-kundendaten">
+        <input type="text" id="input-name" placeholder="Vollständiger Name" required>
+        <input type="text" id="input-tpNumber" placeholder="TP-Nummer" required>
+        <input type="text" id="input-phone" placeholder="Telefonnummer" required>
+        <input type="email" id="input-email" placeholder="E-Mail" required>
+        <input type="text" id="input-wechatId" placeholder="WeChat ID (optional)">
+        <button type="submit">Weiter zur Produktauswahl</button>
+      </form>
+      <div class="footer" id="footer-kundendaten">PM DSC Offenbach am Main</div>
+    </div>
+
+    <div id="screen-operator-login" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-operator-login">&larr; Zurück</button>
+        <div class="title">Operator Login</div>
+      </div>
+      <form id="form-operator-login">
+        <input type="password" id="input-operator-password" placeholder="Passwort" required>
+        <button type="submit">Login</button>
+      </form>
+      <div class="footer" id="footer-operator-login">PM DSC Offenbach am Main</div>
+    </div>
+
+    <div id="screen-operator-dashboard" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-operator-dashboard">&larr; Zurück</button>
         <div class="title">Operator Dashboard</div>
       </div>
+      <button id="btn-show-change-password" style="background-color:#555;">Passwort ändern</button>
+      <div id="operator-products-list"></div>
       <button id="btn-show-add-product">+ Neues Produkt hinzufügen</button>
       <div id="add-product-form" style="display:none;">
         <h3>Neues Produkt</h3>
@@ -201,117 +192,105 @@
           <button type="button" id="btn-cancel-add-product">Abbrechen</button>
         </form>
       </div>
-      <div id="operator-products-list"></div>
+      <div class="footer" id="footer-operator-dashboard">PM DSC Offenbach am Main</div>
+    </div>
+
+    <div id="screen-produktauswahl" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-produktauswahl">&larr; Zurück</button>
+        <div class="title">Produktauswahl</div>
+      </div>
+      <div id="produkt-list"></div>
+      <button id="btn-submit-order">Bestellung abschließen</button>
+      <div class="footer" id="footer-produktauswahl">PM DSC Offenbach am Main</div>
     </div>
   </div>
 
   <script>
+    let operatorPassword = "1234";
     let products = [];
 
     async function loadProducts() {
       try {
         const res = await fetch('/.netlify/functions/products');
+        if (!res.ok) throw new Error(res.statusText);
         products = await res.json();
         renderOperatorProducts();
       } catch (err) {
         console.error("Fehler beim Laden der Produkte:", err);
+        alert("Produkte konnten nicht geladen werden.");
       }
+    }
+
+    async function addProduct(newProduct) {
+      const response = await fetch('/.netlify/functions/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct),
+      });
+      if (!response.ok) throw new Error(`Fehler beim Hinzufügen: ${response.statusText}`);
+      const savedProduct = await response.json();
+      products.push(savedProduct);
+      renderOperatorProducts();
+    }
+
+    async function deleteProduct(productId) {
+      const response = await fetch(`/.netlify/functions/products?id=${productId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error(`Fehler beim Löschen: ${response.statusText}`);
+      products = products.filter(product => product.id !== productId);
+      renderOperatorProducts();
     }
 
     function renderOperatorProducts() {
       const listDiv = document.getElementById('operator-products-list');
       listDiv.innerHTML = "";
-      products.forEach(product => {
+      products.forEach((product) => {
         const prodDiv = document.createElement('div');
         prodDiv.classList.add('product-card');
-
-        let html = "";
-        if (product.imageData) {
-          html += `<img class="product-image" src="${product.imageData}" alt="${product.name}">`;
-        } else {
-          html += `<div style="width:100%;height:100px;background:#eee;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;">Kein Bild</div>`;
-        }
-        html += `<strong>${product.name}</strong><br>Preis: ${parseFloat(product.price).toFixed(2)} €<br>Punkte: ${product.points}`;
-
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = "Entfernen";
-        removeBtn.style.backgroundColor = "#FF3B30";
-        removeBtn.addEventListener('click', async () => {
-          await removeProduct(product.id);
-        });
-
-        prodDiv.innerHTML = html;
-        prodDiv.appendChild(removeBtn);
+        prodDiv.innerHTML = `
+          <img class="product-image" src="${product.imageData}" alt="${product.name}">
+          <strong>${product.name}</strong><br>
+          Preis: ${parseFloat(product.price).toFixed(2)} €<br>
+          Punkte: ${product.points}<br>
+          <button onclick="deleteProduct('${product.id}')" style="background-color:#FF3B30;">Entfernen</button>
+        `;
         listDiv.appendChild(prodDiv);
       });
     }
 
-    async function addProduct(newProduct) {
-      try {
-        const res = await fetch('/.netlify/functions/products', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newProduct)
-        });
-        const savedProduct = await res.json();
-        products.push(savedProduct);
-        renderOperatorProducts();
-      } catch (err) {
-        console.error("Fehler beim Hinzufügen des Produkts:", err);
-      }
-    }
-
-    async function removeProduct(productId) {
-      try {
-        await fetch(`/.netlify/functions/products?id=${productId}`, {
-          method: 'DELETE'
-        });
-        products = products.filter(p => p.id !== productId);
-        renderOperatorProducts();
-      } catch (err) {
-        console.error("Fehler beim Löschen des Produkts:", err);
-      }
-    }
-
-    document.getElementById('btn-show-add-product').addEventListener('click', () => {
-      document.getElementById('add-product-form').style.display = "block";
-    });
-    document.getElementById('btn-cancel-add-product').addEventListener('click', () => {
-      document.getElementById('add-product-form').style.display = "none";
-    });
-
     document.getElementById('form-add-product').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-product-name').value.trim();
-      const price = parseFloat(document.getElementById('input-product-price').value.trim());
+      const price = parseFloat(document.getElementById('input-product-price').value.trim().replace(',', '.'));
       const points = parseInt(document.getElementById('input-product-points').value.trim()) || 0;
       const imageInput = document.getElementById('input-product-image');
 
-      if (!name || isNaN(price)) {
-        alert("Bitte gültige Produktdaten eingeben.");
+      if (!name || isNaN(price) || !imageInput.files[0]) {
+        alert("Bitte alle Felder korrekt ausfüllen.");
         return;
       }
 
       const reader = new FileReader();
-      reader.onload = async (evt) => {
-        const imageData = evt.target.result;
-        const newProduct = { name, price, points, imageData };
-        await addProduct(newProduct);
+      reader.onload = () => {
+        const imageData = reader.result;
+        addProduct({ name, price, points, imageData });
         document.getElementById('form-add-product').reset();
         document.getElementById('add-product-form').style.display = "none";
       };
-
-      if (imageInput.files[0]) {
-        reader.readAsDataURL(imageInput.files[0]);
-      } else {
-        const newProduct = { name, price, points, imageData: null };
-        await addProduct(newProduct);
-        document.getElementById('form-add-product').reset();
-        document.getElementById('add-product-form').style.display = "none";
-      }
+      reader.readAsDataURL(imageInput.files[0]);
     });
 
-    window.addEventListener('DOMContentLoaded', loadProducts);
+    document.getElementById('btn-show-add-product').addEventListener('click', () => {
+      document.getElementById('add-product-form').style.display = "block";
+    });
+
+    document.getElementById('btn-cancel-add-product').addEventListener('click', () => {
+      document.getElementById('add-product-form').style.display = "none";
+    });
+
+    window.onload = loadProducts;
   </script>
 </body>
 </html>
