@@ -296,7 +296,14 @@
     /* ------------------ Globale Variablen ------------------ */
     let operatorPassword = "1234";
     let products = [];
-    let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    // Zugriff auf localStorage in try/catch, um Fehler (z. B. im file://‑Kontext) abzufangen
+    let orders = [];
+    try {
+      orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    } catch (e) {
+      console.error("Kein Zugriff auf localStorage:", e);
+      orders = [];
+    }
     let currentCustomer = {};
     let selectedProducts = [];
     let selectedOrder = [];
@@ -374,7 +381,13 @@
       try {
         const res = await fetch('/.netlify/functions/products');
         if (!res.ok) throw new Error(res.statusText);
-        products = await res.json();
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          throw new Error("Die Antwort ist kein gültiges JSON.");
+        }
+        products = data;
         console.log("Produkte geladen:", products);
       } catch (err) {
         console.error("Fehler beim Laden der Produkte:", err);
@@ -554,7 +567,11 @@
           clientIP
         };
         orders.push(order);
-        localStorage.setItem('orders', JSON.stringify(orders));
+        try {
+          localStorage.setItem('orders', JSON.stringify(orders));
+        } catch (e) {
+          console.error("Fehler beim Speichern im localStorage:", e);
+        }
         renderOrderSummary();
         showScreen("screen-bestelluebersicht");
       });
@@ -616,7 +633,11 @@
     document.getElementById('btn-clear-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich alle alten Bestellungen löschen?")) {
         orders = orders.filter(o => o.clientIP !== clientIP);
-        localStorage.setItem('orders', JSON.stringify(orders));
+        try {
+          localStorage.setItem('orders', JSON.stringify(orders));
+        } catch (e) {
+          console.error("Fehler beim Aktualisieren des localStorage:", e);
+        }
         renderOrderSummary();
         alert("Alte Bestellungen wurden gelöscht.");
       }
