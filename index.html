@@ -69,7 +69,7 @@
       transition: border-color 0.3s;
     }
     input:focus { border-color: #007aff; outline: none; }
-    /* Statt display:none, damit der File-Input unsichtbar, aber fokussierbar bleibt */
+    /* Den File-Input nicht per display:none; ausblenden, sondern so, dass er unsichtbar, aber fokussierbar bleibt */
     input[type="file"] {
       position: absolute;
       opacity: 0;
@@ -186,23 +186,125 @@
 </head>
 <body>
   <div class="container">
-    <!-- Hier folgt der komplette HTML-Code für alle Screens (Kundendaten, Operator Login, Operator Dashboard, Produktauswahl, Zahlungsart, Bestellübersicht, etc.) -->
-    <!-- ... Dein vorhandener HTML-Code ... -->
+    <!-- Hier folgen alle Screens: Kundendaten, Operator Login, Operator Dashboard, Produktauswahl, Zahlungsart, Bestellübersicht, etc. -->
+    <!-- Für die Vollständigkeit findest du hier ein Beispiel-Skelett – ersetze es ggf. mit deinem vollständigen HTML-Code -->
+    
+    <!-- Kundendaten Screen -->
+    <div id="screen-kundendaten" class="screen active">
+      <div class="header">
+        <button class="back-button" id="back-kundendaten" disabled>&larr; Zurück</button>
+        <div class="title">Kundendaten</div>
+      </div>
+      <form id="form-kundendaten">
+        <input type="text" id="input-name" placeholder="Vollständiger Name" required>
+        <input type="text" id="input-tpNumber" placeholder="TP-Nummer" required>
+        <input type="text" id="input-phone" placeholder="Telefonnummer" required>
+        <input type="email" id="input-email" placeholder="E-Mail" required>
+        <input type="text" id="input-wechatId" placeholder="WeChat ID (optional)">
+        <button type="submit">Weiter zur Produktauswahl</button>
+      </form>
+      <div class="footer" id="footer-kundendaten">PM DSC Offenbach am Main</div>
+    </div>
+    
+    <!-- Operator Login Screen -->
+    <div id="screen-operator-login" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-operator-login">&larr; Zurück</button>
+        <div class="title">Operator Login</div>
+      </div>
+      <form id="form-operator-login">
+        <input type="password" id="input-operator-password" placeholder="Passwort" required>
+        <button type="submit">Login</button>
+      </form>
+      <div class="footer" id="footer-operator-login">PM DSC Offenbach am Main</div>
+    </div>
+    
+    <!-- Operator Dashboard Screen -->
+    <div id="screen-operator-dashboard" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-operator-dashboard">&larr; Zurück</button>
+        <div class="title">Operator Dashboard</div>
+      </div>
+      <button id="btn-show-change-password" style="background-color:#555;">Passwort ändern</button>
+      <div id="operator-products-list"></div>
+      <button id="btn-show-add-product">+ Neues Produkt hinzufügen</button>
+      <div id="add-product-form" style="display:none;">
+        <h3>Neues Produkt</h3>
+        <form id="form-add-product">
+          <input type="text" id="input-product-name" placeholder="Produktname" required>
+          <input type="text" id="input-product-price" placeholder="Preis (z.B. 9.99)" required>
+          <input type="number" id="input-product-points" placeholder="Punkte (z.B. 10)" value="0">
+          <label class="label-file" for="input-product-image">Bild hochladen</label>
+          <input type="file" id="input-product-image" accept="image/*" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
+          <button type="submit">Hinzufügen</button>
+          <button type="button" id="btn-cancel-add-product">Abbrechen</button>
+        </form>
+      </div>
+      <div class="footer" id="footer-operator-dashboard">PM DSC Offenbach am Main</div>
+    </div>
+    
+    <!-- Produktauswahl Screen -->
+    <div id="screen-produktauswahl" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-produktauswahl">&larr; Zurück</button>
+        <div class="title">Produktauswahl</div>
+      </div>
+      <div id="produkt-list"></div>
+      <button id="btn-submit-order">Bestellung abschließen</button>
+      <div class="footer" id="footer-produktauswahl">PM DSC Offenbach am Main</div>
+    </div>
+    
+    <!-- Zahlungsart Screen -->
+    <div id="screen-zahlungsart" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-zahlungsart">&larr; Zurück</button>
+        <div class="title">Zahlungsart</div>
+      </div>
+      <button class="payment-option" data-method="Bar">Bar</button>
+      <button class="payment-option" data-method="EC-Karte">EC‑Karte</button>
+      <button class="payment-option" data-method="Lastschrift">Lastschrift</button>
+      <button class="payment-option" data-method="Überweisung">Überweisung</button>
+      <div class="footer" id="footer-zahlungsart">PM DSC Offenbach am Main</div>
+    </div>
+    
+    <!-- Bestellübersicht Screen -->
+    <div id="screen-bestelluebersicht" class="screen">
+      <div class="header">
+        <button class="back-button" id="back-bestelluebersicht">&larr; Zurück</button>
+        <div class="title">Bestellübersicht</div>
+      </div>
+      <div id="order-summary"></div>
+      <button id="btn-export-excel">Bestellungen als Excel exportieren</button>
+      <button id="btn-new-order">Neue Bestellung</button>
+      <button id="btn-clear-orders">Alte Bestellungen löschen</button>
+      <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
+    </div>
+  </div>
+  
+  <!-- Modal: Passwort ändern -->
+  <div id="modal-change-password" class="modal">
+    <div class="modal-content">
+      <h3>Passwort ändern</h3>
+      <form id="form-change-password">
+        <input type="password" id="current-password" placeholder="Aktuelles Passwort" required>
+        <input type="password" id="new-password" placeholder="Neues Passwort" required>
+        <input type="password" id="confirm-new-password" placeholder="Neues Passwort bestätigen" required>
+        <button type="submit">Passwort ändern</button>
+        <button type="button" id="btn-cancel-change-password">Abbrechen</button>
+      </form>
+    </div>
   </div>
   
   <script>
-    // Dein JavaScript-Code bleibt weitgehend unverändert.
-    // Er umfasst Funktionen für Navigation, Formularverarbeitung, Produktmanagement, Bestellung, etc.
-    
-    let operatorPassword = "1234"; // Festes Passwort für Operator
-    let products = [];             // Produktliste (wird via Netlify Function geladen)
+    /* ------------------ Globale Variablen ------------------ */
+    let operatorPassword = "1234";
+    let products = [];
     let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    
     let currentCustomer = {};
     let selectedProducts = [];
     let selectedOrder = [];
-    
     let clientIP = "";
+    
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => { clientIP = data.ip; })
@@ -265,7 +367,7 @@
       }
     });
     
-    // Laden und Anzeigen der Produkte (Operator Dashboard)
+    // Produkte laden (Operator Dashboard)
     async function loadProducts() {
       try {
         const res = await fetch('/.netlify/functions/products');
@@ -370,7 +472,6 @@
       reader.readAsDataURL(imageInput.files[0]);
     });
     
-    // Produktauswahl Screen
     function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
       listDiv.innerHTML = "";
@@ -416,7 +517,6 @@
       showScreen("screen-zahlungsart");
     });
     
-    // Zahlungsart Screen
     document.querySelectorAll('.payment-option').forEach(button => {
       button.addEventListener('click', () => {
         const paymentMethod = button.dataset.method;
@@ -441,7 +541,6 @@
       });
     });
     
-    // Bestellübersicht Screen
     function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
       let html = "";
@@ -492,7 +591,6 @@
       showScreen("screen-kundendaten");
     });
     
-    // Alte Bestellungen löschen
     document.getElementById('btn-clear-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich alle alten Bestellungen löschen?")) {
         orders = orders.filter(o => o.clientIP !== clientIP);
@@ -528,7 +626,6 @@
       document.body.removeChild(link);
     }
     
-    // Modal: Passwort ändern
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
       document.getElementById('modal-change-password').classList.add('active');
     });

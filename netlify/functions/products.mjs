@@ -1,4 +1,4 @@
-// Setze global.localStorage, bevor faunadb importiert wird:
+// Setze global.localStorage, falls nicht vorhanden (in Node ist localStorage nicht definiert)
 if (typeof global.localStorage === 'undefined') {
   global.localStorage = {
     getItem() { return null; },
