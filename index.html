@@ -536,7 +536,7 @@
       e.preventDefault();
       const inputPass = document.getElementById('input-operator-password').value;
       if (inputPass === operatorPassword) {
-        // Falls bereits Produkte im lokalen Array vorhanden sind (z. B. durch Import), laden wir nicht neu vom Server.
+        // Falls lokale Produkte (z. B. durch Import) vorhanden sind, sollen diese nicht überschrieben werden.
         if (products.length === 0) {
           await loadProducts();
         }
@@ -608,7 +608,7 @@
       }
     }
 
-    // Angepasst: Nur wenn das lokale Array leer ist, wird vom Server geladen.
+    // Beim Rendern im Operator-Dashboard: Wenn Produkte bereits vorhanden sind (z. B. nach Import), nicht neu laden.
     async function renderOperatorProducts() {
       if (products.length === 0) {
         await loadProducts();
@@ -631,17 +631,22 @@
         html += `<br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
                  Punkte: ${product.points}<br>`;
         prodDiv.innerHTML = html;
-        // Entfernen-Button
+        // Entfernen-Button: Falls das Produkt lokal ist, wird nicht der Server-Endpoint aufgerufen.
         const removeBtn = document.createElement('button');
         removeBtn.textContent = "Entfernen";
         removeBtn.style.backgroundColor = "#FF3B30";
         removeBtn.addEventListener('click', async () => {
-          try {
-            await deleteProduct(product.id);
+          if (product.local) {
             products.splice(index, 1);
             renderOperatorProducts();
-          } catch (err) {
-            console.error("Fehler beim Löschen des Produkts:", err);
+          } else {
+            try {
+              await deleteProduct(product.id);
+              products.splice(index, 1);
+              renderOperatorProducts();
+            } catch (err) {
+              console.error("Fehler beim Löschen des Produkts:", err);
+            }
           }
         });
         // Bearbeiten-Button
@@ -653,6 +658,7 @@
           document.getElementById('input-product-price').value = product.price;
           document.getElementById('input-product-points').value = product.points;
           document.getElementById('input-product-description').value = product.description || "";
+          // Hinweis: Das Bildfeld wird nicht vorab gefüllt – hier ggf. neu auswählen.
           editingProduct = { index, product };
           document.getElementById('form-title').textContent = "Produkt bearbeiten";
           document.getElementById('add-product-form').style.display = "block";
@@ -682,6 +688,7 @@
       const points = parseInt(document.getElementById('input-product-points').value.trim()) || 0;
       const description = document.getElementById('input-product-description').value.trim();
       const imageInput = document.getElementById('input-product-image');
+      // Bei neuen Produkten muss ein Bild ausgewählt werden
       if (!name || !priceStr || (!editingProduct && (!imageInput.files || !imageInput.files[0]))) {
         alert("Bitte alle erforderlichen Felder ausfüllen und ein Bild auswählen (bei neuen Produkten).");
         return;
@@ -711,9 +718,15 @@
           productData.imageData = imageData;
         }
         if (editingProduct) {
-          const updated = await updateProduct(editingProduct.product.id, productData);
-          products[editingProduct.index] = updated;
-          editingProduct = null;
+          if (editingProduct.product.local) {
+            // Update lokal
+            products[editingProduct.index] = { ...editingProduct.product, ...productData, local: true };
+            editingProduct = null;
+          } else {
+            const updated = await updateProduct(editingProduct.product.id, productData);
+            products[editingProduct.index] = updated;
+            editingProduct = null;
+          }
         } else {
           const savedProduct = await addProduct(productData);
           products.push(savedProduct);
@@ -964,6 +977,13 @@
             const importedProducts = JSON.parse(fileContent);
             console.log("Importierte Produkte:", importedProducts);
             if (Array.isArray(importedProducts)) {
+              // Falls Produkte keine id haben, generiere eine und setze ein Flag "local"
+              importedProducts.forEach(prod => {
+                if (!prod.id) {
+                  prod.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                  prod.local = true;
+                }
+              });
               products = importedProducts;
               selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
               renderOperatorProducts();
