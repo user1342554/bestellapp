@@ -187,13 +187,39 @@
       display: none;
     }
     .delete-order-btn {
-      background-color: red;
-      color: white;
+      background-color: #dc3545;
+      color: #fff;
       border: none;
       border-radius: 50%;
       width: 24px;
       height: 24px;
       cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    .delete-order-btn:hover {
+      background-color: #c82333;
+      transform: scale(1.1);
+    }
+    .delete-order-btn:active {
+      transform: scale(0.95);
+    }
+    /* Neuer Stil für den Button "Alle Bestellungen löschen" */
+    #btn-clear-all-orders {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      font-size: 16px;
+    }
+    #btn-clear-all-orders:hover {
+      background-color: #c82333;
+      transform: scale(1.02);
+    }
+    #btn-clear-all-orders:active {
+      transform: scale(0.98);
     }
     .modal {
       position: fixed;
@@ -593,7 +619,7 @@
       });
     });
     
-    // Neue Version von renderOrderSummary mit collapsiblen Bestellungen und Löschen einzelner Orders
+    // Bestellübersicht als Akkordeon mit Detailanzeige und Einzellösch-Button
     function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
       summaryDiv.innerHTML = "";
@@ -607,7 +633,7 @@
         const orderDate = new Date(order.timestamp);
         const dateStr = orderDate.toLocaleString();
         
-        // Erstelle einen Container für die Bestellung
+        // Container für die Bestellung
         const orderItem = document.createElement('div');
         orderItem.classList.add('order-item');
         
@@ -622,9 +648,8 @@
         deleteBtn.classList.add('delete-order-btn');
         deleteBtn.textContent = "X";
         deleteBtn.addEventListener('click', (event) => {
-          event.stopPropagation(); // Verhindert, dass das Akkordeon getoggelt wird
+          event.stopPropagation(); // Verhindert Toggle des Akkordeons
           if (confirm("Diese Bestellung wirklich löschen?")) {
-            // Entferne die Bestellung aus dem orders-Array (über den Zeitstempel und clientIP)
             orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
             localStorage.setItem('orders', JSON.stringify(orders));
             renderOrderSummary();
@@ -669,7 +694,7 @@
           <p><strong>Gesamtpunkte:</strong> ${order.totalPoints}</p>`;
         orderDetails.innerHTML = detailsHTML;
         
-        // Toggle-Event: Klick auf Header schaltet Details ein/aus
+        // Toggle-Event: Klick auf Header toggelt Details
         orderHeader.addEventListener('click', () => {
           orderDetails.style.display = (orderDetails.style.display === "none" || orderDetails.style.display === "") ? "block" : "none";
         });
@@ -680,14 +705,13 @@
       });
     }
     
-    // Knopf: Neue Bestellung (bleibt unverändert)
     document.getElementById('btn-new-order').addEventListener('click', () => {
       currentCustomer = {};
       selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       showScreen("screen-kundendaten");
     });
     
-    // Neuer Knopf: Alle Bestellungen löschen (löscht sämtliche Bestellungen)
+    // Knopf: Alle Bestellungen löschen (löscht sämtliche Bestellungen)
     document.getElementById('btn-clear-all-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich ALLE Bestellungen löschen?")) {
         orders = [];
