@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Minimalistische Web App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SheetJS (xlsx) einbinden -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     /* Globales CSS */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -204,7 +206,6 @@
       </form>
       <div class="footer" id="footer-kundendaten">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Operator Login Screen -->
     <div id="screen-operator-login" class="screen">
       <div class="header">
@@ -217,7 +218,6 @@
       </form>
       <div class="footer" id="footer-operator-login">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Operator Dashboard Screen -->
     <div id="screen-operator-dashboard" class="screen">
       <div class="header">
@@ -241,7 +241,6 @@
       </div>
       <div class="footer" id="footer-operator-dashboard">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Produktauswahl Screen -->
     <div id="screen-produktauswahl" class="screen">
       <div class="header">
@@ -252,7 +251,6 @@
       <button id="btn-submit-order">Bestellung abschließen</button>
       <div class="footer" id="footer-produktauswahl">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Zahlungsart Screen -->
     <div id="screen-zahlungsart" class="screen">
       <div class="header">
@@ -265,7 +263,6 @@
       <button class="payment-option" data-method="Überweisung">Überweisung</button>
       <div class="footer" id="footer-zahlungsart">PM DSC Offenbach am Main</div>
     </div>
-    
     <!-- Bestellübersicht Screen -->
     <div id="screen-bestelluebersicht" class="screen">
       <div class="header">
@@ -273,13 +270,13 @@
         <div class="title">Bestellübersicht</div>
       </div>
       <div id="order-summary"></div>
+      <!-- Button für Excel-Export -->
       <button id="btn-export-excel">Bestellungen als Excel exportieren</button>
       <button id="btn-new-order">Neue Bestellung</button>
       <button id="btn-clear-orders">Alte Bestellungen löschen</button>
       <div class="footer" id="footer-bestelluebersicht">PM DSC Offenbach am Main</div>
     </div>
   </div>
-  
   <!-- Modal: Passwort ändern -->
   <div id="modal-change-password" class="modal">
     <div class="modal-content">
@@ -293,7 +290,6 @@
       </form>
     </div>
   </div>
-  
   <script>
     /* ------------------ Globale Variablen ------------------ */
     let operatorPassword = "1234";
@@ -309,15 +305,15 @@
     let selectedProducts = [];
     let selectedOrder = [];
     let clientIP = "";
-
+    
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => { clientIP = data.ip; })
       .catch(() => { clientIP = "unbekannt"; });
-
+    
     let navHistory = [];
     let currentScreen = "screen-kundendaten";
-
+    
     function showScreen(screenId, pushHistory = true) {
       if (pushHistory && currentScreen && currentScreen !== screenId) {
         navHistory.push(currentScreen);
@@ -326,7 +322,7 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
     }
-
+    
     function goBack() {
       if (navHistory.length > 0) {
         const previousScreen = navHistory.pop();
@@ -335,12 +331,12 @@
         document.getElementById(previousScreen).classList.add('active');
       }
     }
-
+    
     document.querySelectorAll('.back-button').forEach(btn => btn.addEventListener('click', goBack));
     document.querySelectorAll('.footer').forEach(f => {
       f.addEventListener('click', () => { showScreen("screen-operator-login"); });
     });
-
+    
     document.getElementById('form-kundendaten').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-name').value.trim();
@@ -348,7 +344,7 @@
       const phone = document.getElementById('input-phone').value.trim();
       const email = document.getElementById('input-email').value.trim().toLowerCase();
       const wechatId = document.getElementById('input-wechatId').value.trim();
-
+    
       if (name && tpNumber && phone && email) {
         await loadProducts();
         currentCustomer = { name, tpNumber, phone, email, wechatId, ip: clientIP };
@@ -359,7 +355,7 @@
         alert("Bitte alle erforderlichen Felder ausfüllen.");
       }
     });
-
+    
     document.getElementById('form-operator-login').addEventListener('submit', async e => {
       e.preventDefault();
       const inputPass = document.getElementById('input-operator-password').value;
@@ -370,7 +366,7 @@
         alert("Ungültiges Passwort.");
       }
     });
-
+    
     async function loadProducts() {
       try {
         const res = await fetch('/.netlify/functions/products');
@@ -388,7 +384,7 @@
         alert("Produkte konnten nicht geladen werden.");
       }
     }
-
+    
     async function addProduct(newProduct) {
       try {
         const response = await fetch('/.netlify/functions/products', {
@@ -403,7 +399,7 @@
         throw err;
       }
     }
-
+    
     async function deleteProduct(productId) {
       try {
         const response = await fetch(`/.netlify/functions/products?id=${productId}`, {
@@ -416,7 +412,7 @@
         throw err;
       }
     }
-
+    
     async function renderOperatorProducts() {
       await loadProducts();
       const listDiv = document.getElementById('operator-products-list');
@@ -450,14 +446,15 @@
         listDiv.appendChild(prodDiv);
       });
     }
-
+    
     document.getElementById('btn-show-add-product').addEventListener('click', () => {
       document.getElementById('add-product-form').style.display = "block";
     });
+    
     document.getElementById('btn-cancel-add-product').addEventListener('click', () => {
       document.getElementById('add-product-form').style.display = "none";
     });
-
+    
     document.getElementById('form-add-product').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-product-name').value.trim();
@@ -521,6 +518,7 @@
         renderProduktList();
       }
     }
+    
     function increaseQuantity(i) {
       selectedProducts[i].quantity++;
       renderProduktList();
@@ -627,33 +625,52 @@
       }
     });
     
-    document.getElementById('btn-export-excel').addEventListener('click', () => {
-      exportOrdersToCSV();
-    });
-    
-    function exportOrdersToCSV() {
+    // Exportiere Bestellungen als Excel-Datei mit SheetJS
+    function exportOrdersToExcel() {
       const filteredOrders = orders.filter(o => o.clientIP === clientIP);
       if (filteredOrders.length === 0) {
         alert("Keine Bestellungen vorhanden.");
         return;
       }
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += `"Name";"TP-Nummer";"Telefon";"E-Mail";"WeChat ID";"Zahlungsart";"Produkt";"Anzahl";"Preis";"Punkte"\n`;
+      let rows = [];
+      // Kopfzeile
+      rows.push(["Name", "TP-Nummer", "Telefon", "E-Mail", "WeChat ID", "Zahlungsart", "Produkt", "Anzahl", "Preis", "Punkte"]);
       filteredOrders.forEach(order => {
         order.products.forEach(product => {
-          const formattedPrice = parseFloat(product.price).toFixed(2);
-          const tel = "'" + order.customer.phone;
-          csvContent += `"${order.customer.name}";"${order.customer.tpNumber}";"${tel}";"${order.customer.email}";"${order.customer.wechatId || ""}";"${order.paymentMethod}";"${product.name}";"${product.quantity}";"${formattedPrice} €";"${product.points}"\n`;
+          rows.push([
+            order.customer.name,
+            order.customer.tpNumber,
+            order.customer.phone,
+            order.customer.email,
+            order.customer.wechatId || "",
+            order.paymentMethod,
+            product.name,
+            product.quantity,
+            parseFloat(product.price).toFixed(2) + " €",
+            product.points
+          ]);
         });
       });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "bestellungen.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      let wb = XLSX.utils.book_new();
+      let ws = XLSX.utils.aoa_to_sheet(rows);
+      // Passe Spaltenbreiten an (wch = "character width")
+      ws['!cols'] = [
+        { wch: 20 }, // Name
+        { wch: 15 }, // TP-Nummer
+        { wch: 15 }, // Telefon
+        { wch: 25 }, // E-Mail
+        { wch: 20 }, // WeChat ID
+        { wch: 15 }, // Zahlungsart
+        { wch: 20 }, // Produkt
+        { wch: 10 }, // Anzahl
+        { wch: 12 }, // Preis
+        { wch: 10 }  // Punkte
+      ];
+      XLSX.utils.book_append_sheet(wb, ws, "Bestellungen");
+      XLSX.writeFile(wb, "bestellungen.xlsx");
     }
+    
+    document.getElementById('btn-export-excel').addEventListener('click', exportOrdersToExcel);
     
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
       document.getElementById('modal-change-password').classList.add('active');
