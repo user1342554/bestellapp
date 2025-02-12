@@ -467,31 +467,29 @@
   </div>
 
   <script>
-    /* ------------------ Globale Variablen & IP-Erfassung ------------------ */
+    /***********************
+     * Globale Variablen und Persistenz über Server-Endpunkte
+     ***********************/
     let operatorPassword = "1234";
-    let products = [];
-    let orders = [];
-    try {
-      orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    } catch (e) {
-      console.error("Kein Zugriff auf localStorage:", e);
-      orders = [];
-    }
+    let products = [];  // Wird vom Server geladen
+    let orders = [];    // Wird vom Server geladen
     let currentCustomer = {};
     let selectedProducts = [];
     let selectedOrder = [];
     let clientIP = "";
-    let editingProduct = null; // speichert aktuell zu bearbeitendes Produkt
+    let editingProduct = null; // Speichert das aktuell zu bearbeitende Produkt
 
+    // Hole Client-IP
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
       .then(data => { clientIP = data.ip; })
       .catch(() => { clientIP = "unbekannt"; });
 
+    /***********************
+     * Navigation
+     ***********************/
     let navHistory = [];
     let currentScreen = "screen-kundendaten";
-
-    /* ------------------ Navigation & Screen-Wechsel ------------------ */
     function showScreen(screenId, pushHistory = true) {
       if (pushHistory && currentScreen && currentScreen !== screenId) {
         navHistory.push(currentScreen);
@@ -513,7 +511,105 @@
       f.addEventListener('click', () => { showScreen("screen-operator-login"); });
     });
 
-    /* ------------------ Formulare & Produkte laden ------------------ */
+    /***********************
+     * Server-API Funktionen für Produkte
+     ***********************/
+    async function loadProducts() {
+      try {
+        const res = await fetch('/.netlify/functions/products');
+        if (!res.ok) throw new Error(res.statusText);
+        products = await res.json();
+        console.log("Produkte vom Server geladen:", products);
+      } catch(err) {
+        console.error("Fehler beim Laden der Produkte:", err);
+        alert("Produkte konnten nicht geladen werden.");
+      }
+    }
+    async function addProduct(newProduct) {
+      try {
+        const res = await fetch('/.netlify/functions/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newProduct)
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        return await res.json();
+      } catch(err) {
+        console.error("Fehler beim Hinzufügen des Produkts:", err);
+        throw err;
+      }
+    }
+    async function updateProduct(productId, updatedProduct) {
+      try {
+        const res = await fetch(`/.netlify/functions/products?id=${productId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedProduct)
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        return await res.json();
+      } catch(err) {
+        console.error("Fehler beim Aktualisieren des Produkts:", err);
+        throw err;
+      }
+    }
+    async function deleteProduct(productId) {
+      try {
+        const res = await fetch(`/.netlify/functions/products?id=${productId}`, {
+          method: 'DELETE'
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        return await res.json();
+      } catch(err) {
+        console.error("Fehler beim Löschen des Produkts:", err);
+        throw err;
+      }
+    }
+
+    /***********************
+     * Server-API Funktionen für Bestellungen
+     ***********************/
+    async function loadOrders() {
+      try {
+        const res = await fetch('/.netlify/functions/orders');
+        if (!res.ok) throw new Error(res.statusText);
+        orders = await res.json();
+        console.log("Bestellungen vom Server geladen:", orders);
+      } catch(err) {
+        console.error("Fehler beim Laden der Bestellungen:", err);
+        orders = [];
+      }
+    }
+    async function postOrder(order) {
+      try {
+        const res = await fetch('/.netlify/functions/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(order)
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        return await res.json();
+      } catch(err) {
+        console.error("Fehler beim Speichern der Bestellung:", err);
+        throw err;
+      }
+    }
+    async function deleteOrder(orderId) {
+      try {
+        const res = await fetch(`/.netlify/functions/orders?id=${orderId}`, {
+          method: 'DELETE'
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        return await res.json();
+      } catch(err) {
+        console.error("Fehler beim Löschen der Bestellung:", err);
+        throw err;
+      }
+    }
+
+    /***********************
+     * Formular & Produktmanagement
+     ***********************/
     document.getElementById('form-kundendaten').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-name').value.trim();
@@ -531,15 +627,11 @@
         alert("Bitte alle erforderlichen Felder ausfüllen.");
       }
     });
-
     document.getElementById('form-operator-login').addEventListener('submit', async e => {
       e.preventDefault();
       const inputPass = document.getElementById('input-operator-password').value;
       if (inputPass === operatorPassword) {
-        // Falls lokale Produkte (z. B. durch Import) vorhanden sind, sollen diese nicht überschrieben werden.
-        if (products.length === 0) {
-          await loadProducts();
-        }
+        await loadProducts();
         renderOperatorProducts();
         showScreen("screen-operator-dashboard");
       } else {
@@ -547,72 +639,8 @@
       }
     });
 
-    async function loadProducts() {
-      try {
-        const res = await fetch('/.netlify/functions/products');
-        if (!res.ok) throw new Error(res.statusText);
-        let data;
-        try {
-          data = await res.json();
-        } catch (e) {
-          throw new Error("Die Antwort ist kein gültiges JSON.");
-        }
-        products = data;
-        console.log("Produkte geladen:", products);
-      } catch (err) {
-        console.error("Fehler beim Laden der Produkte:", err);
-        alert("Produkte konnten nicht geladen werden.");
-      }
-    }
-
-    async function addProduct(newProduct) {
-      try {
-        const response = await fetch('/.netlify/functions/products', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newProduct),
-        });
-        if (!response.ok) throw new Error(`Fehler beim Hinzufügen: ${response.statusText}`);
-        return await response.json();
-      } catch (err) {
-        console.error("Fehler beim Hinzufügen des Produkts:", err);
-        throw err;
-      }
-    }
-
-    async function updateProduct(productId, updatedProduct) {
-      try {
-        const response = await fetch(`/.netlify/functions/products?id=${productId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedProduct),
-        });
-        if (!response.ok) throw new Error(`Fehler beim Aktualisieren: ${response.statusText}`);
-        return await response.json();
-      } catch (err) {
-        console.error("Fehler beim Aktualisieren des Produkts:", err);
-        throw err;
-      }
-    }
-
-    async function deleteProduct(productId) {
-      try {
-        const response = await fetch(`/.netlify/functions/products?id=${productId}`, {
-          method: 'DELETE',
-        });
-        if (!response.ok) throw new Error(`Fehler beim Löschen: ${response.statusText}`);
-        return await response.json();
-      } catch (err) {
-        console.error("Fehler beim Löschen des Produkts:", err);
-        throw err;
-      }
-    }
-
-    // Beim Rendern im Operator-Dashboard: Wenn Produkte bereits vorhanden sind (z. B. nach Import), nicht neu laden.
     async function renderOperatorProducts() {
-      if (products.length === 0) {
-        await loadProducts();
-      }
+      await loadProducts();
       const listDiv = document.getElementById('operator-products-list');
       listDiv.innerHTML = "";
       products.forEach((product, index) => {
@@ -631,22 +659,17 @@
         html += `<br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
                  Punkte: ${product.points}<br>`;
         prodDiv.innerHTML = html;
-        // Entfernen-Button: Falls das Produkt lokal ist, wird nicht der Server-Endpoint aufgerufen.
+        // Löschen-Button
         const removeBtn = document.createElement('button');
         removeBtn.textContent = "Entfernen";
         removeBtn.style.backgroundColor = "#FF3B30";
         removeBtn.addEventListener('click', async () => {
-          if (product.local) {
-            products.splice(index, 1);
+          try {
+            await deleteProduct(product.id);
+            await loadProducts();
             renderOperatorProducts();
-          } else {
-            try {
-              await deleteProduct(product.id);
-              products.splice(index, 1);
-              renderOperatorProducts();
-            } catch (err) {
-              console.error("Fehler beim Löschen des Produkts:", err);
-            }
+          } catch (err) {
+            console.error("Fehler beim Löschen des Produkts:", err);
           }
         });
         // Bearbeiten-Button
@@ -658,7 +681,6 @@
           document.getElementById('input-product-price').value = product.price;
           document.getElementById('input-product-points').value = product.points;
           document.getElementById('input-product-description').value = product.description || "";
-          // Hinweis: Das Bildfeld wird nicht vorab gefüllt – hier ggf. neu auswählen.
           editingProduct = { index, product };
           document.getElementById('form-title').textContent = "Produkt bearbeiten";
           document.getElementById('add-product-form').style.display = "block";
@@ -675,12 +697,10 @@
       document.getElementById('form-title').textContent = "Neues Produkt";
       document.getElementById('add-product-form').style.display = "block";
     });
-
     document.getElementById('btn-cancel-add-product').addEventListener('click', () => {
       document.getElementById('add-product-form').style.display = "none";
       editingProduct = null;
     });
-
     document.getElementById('form-add-product').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-product-name').value.trim();
@@ -688,7 +708,6 @@
       const points = parseInt(document.getElementById('input-product-points').value.trim()) || 0;
       const description = document.getElementById('input-product-description').value.trim();
       const imageInput = document.getElementById('input-product-image');
-      // Bei neuen Produkten muss ein Bild ausgewählt werden
       if (!name || !priceStr || (!editingProduct && (!imageInput.files || !imageInput.files[0]))) {
         alert("Bitte alle erforderlichen Felder ausfüllen und ein Bild auswählen (bei neuen Produkten).");
         return;
@@ -698,7 +717,6 @@
         alert("Ungültiger Preis!");
         return;
       }
-      // Bild lesen (falls vorhanden)
       const readImage = () => {
         return new Promise((resolve, reject) => {
           if (imageInput.files && imageInput.files[0]) {
@@ -718,19 +736,14 @@
           productData.imageData = imageData;
         }
         if (editingProduct) {
-          if (editingProduct.product.local) {
-            // Update lokal
-            products[editingProduct.index] = { ...editingProduct.product, ...productData, local: true };
-            editingProduct = null;
-          } else {
-            const updated = await updateProduct(editingProduct.product.id, productData);
-            products[editingProduct.index] = updated;
-            editingProduct = null;
-          }
+          const updated = await updateProduct(editingProduct.product.id, productData);
+          products[editingProduct.index] = updated;
+          editingProduct = null;
         } else {
           const savedProduct = await addProduct(productData);
           products.push(savedProduct);
         }
+        await loadProducts();
         renderOperatorProducts();
         document.getElementById('form-add-product').reset();
         document.getElementById('add-product-form').style.display = "none";
@@ -743,6 +756,8 @@
     function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
       listDiv.innerHTML = "";
+      // Erstelle eine Kopie von "products" mit Quantitäten = 0
+      selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       selectedProducts.forEach((product, index) => {
         const prodDiv = document.createElement('div');
         prodDiv.classList.add('product-card');
@@ -766,7 +781,6 @@
         listDiv.appendChild(prodDiv);
       });
     }
-
     function decreaseQuantity(i) {
       if (selectedProducts[i].quantity > 0) {
         selectedProducts[i].quantity--;
@@ -777,55 +791,49 @@
       selectedProducts[i].quantity++;
       renderProduktList();
     }
-
-    document.getElementById('btn-submit-order').addEventListener('click', () => {
+    document.getElementById('btn-submit-order').addEventListener('click', async () => {
       const orderProducts = selectedProducts.filter(p => p.quantity > 0);
       if (orderProducts.length === 0) {
         alert("Bitte wählen Sie mindestens ein Produkt aus.");
         return;
       }
       selectedOrder = orderProducts;
-      showScreen("screen-zahlungsart");
+      const order = {
+        customer: currentCustomer,
+        products: selectedOrder,
+        paymentMethod: "", // wird später gesetzt
+        totalPrice: orderProducts.reduce((sum, p) => sum + p.price * p.quantity, 0),
+        totalPoints: orderProducts.reduce((sum, p) => sum + p.points * p.quantity, 0),
+        clientIP,
+        timestamp: Date.now()
+      };
+      try {
+        const savedOrder = await postOrder(order);
+        console.log("Bestellung gespeichert:", savedOrder);
+        await loadOrders();
+        renderOrderSummary();
+        showScreen("screen-bestelluebersicht");
+      } catch (err) {
+        console.error("Fehler beim Speichern der Bestellung:", err);
+        alert("Fehler beim Speichern der Bestellung.");
+      }
     });
-
     document.querySelectorAll('.payment-option').forEach(button => {
       button.addEventListener('click', () => {
-        const paymentMethod = button.dataset.method;
-        let totalPrice = 0;
-        let totalPoints = 0;
-        selectedOrder.forEach(p => {
-          totalPrice += p.price * p.quantity;
-          totalPoints += p.points * p.quantity;
-        });
-        const order = {
-          customer: currentCustomer,
-          products: selectedOrder,
-          paymentMethod,
-          totalPrice,
-          totalPoints,
-          clientIP,
-          timestamp: Date.now()
-        };
-        orders.push(order);
-        try {
-          localStorage.setItem('orders', JSON.stringify(orders));
-        } catch (e) {
-          console.error("Fehler beim Speichern im localStorage:", e);
-        }
+        selectedOrder.paymentMethod = button.dataset.method;
         renderOrderSummary();
         showScreen("screen-bestelluebersicht");
       });
     });
-
-    function renderOrderSummary() {
+    async function renderOrderSummary() {
+      await loadOrders();
       const summaryDiv = document.getElementById('order-summary');
       summaryDiv.innerHTML = "";
-      const filteredOrders = orders.filter(o => o.clientIP === clientIP);
-      if (filteredOrders.length === 0) {
-        summaryDiv.innerHTML = "<p>Es wurden noch keine Bestellungen von Ihrer IP aufgezeichnet.</p>";
+      if (orders.length === 0) {
+        summaryDiv.innerHTML = "<p>Es wurden noch keine Bestellungen aufgezeichnet.</p>";
         return;
       }
-      filteredOrders.forEach(order => {
+      orders.forEach(order => {
         const orderDate = new Date(order.timestamp);
         const dateStr = orderDate.toLocaleString();
         const orderItem = document.createElement('div');
@@ -842,12 +850,14 @@
             <path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6Z"/>
           </svg>
         `;
-        deleteBtn.addEventListener('click', (event) => {
+        deleteBtn.addEventListener('click', async (event) => {
           event.stopPropagation();
-          if (confirm("Diese Bestellung wirklich löschen?")) {
-            orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
-            localStorage.setItem('orders', JSON.stringify(orders));
+          try {
+            await deleteOrder(order.id);
+            await loadOrders();
             renderOrderSummary();
+          } catch (err) {
+            console.error("Fehler beim Löschen der Bestellung:", err);
           }
         });
         orderHeader.appendChild(headerText);
@@ -894,58 +904,27 @@
       });
     }
 
-    document.getElementById('btn-new-order').addEventListener('click', () => {
-      currentCustomer = {};
+    document.getElementById('btn-new-order').addEventListener('click', async () => {
+      await loadProducts();
       selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
       showScreen("screen-kundendaten");
     });
-
-    document.getElementById('btn-clear-all-orders').addEventListener('click', () => {
+    document.getElementById('btn-clear-all-orders').addEventListener('click', async () => {
       if (confirm("Möchtest du wirklich ALLE Bestellungen löschen?")) {
-        orders = [];
-        localStorage.setItem('orders', JSON.stringify(orders));
-        renderOrderSummary();
+        try {
+          // Annahme: Dieser Endpoint löscht alle Bestellungen
+          await fetch('/.netlify/functions/orders', { method: 'DELETE' });
+          await loadOrders();
+          renderOrderSummary();
+        } catch (err) {
+          console.error("Fehler beim Löschen aller Bestellungen:", err);
+        }
       }
     });
 
-    /* ------------------ Export in Excel (SheetJS) ------------------ */
-    function exportOrdersToExcel() {
-      const filteredOrders = orders.filter(o => o.clientIP === clientIP);
-      if (filteredOrders.length === 0) {
-        alert("Keine Bestellungen vorhanden.");
-        return;
-      }
-      let rows = [];
-      rows.push(["Name", "TP-Nummer", "Telefon", "E-Mail", "WeChat ID", "Zahlungsart", "Produkt", "Anzahl", "Preis", "Punkte"]);
-      filteredOrders.forEach(order => {
-        order.products.forEach(product => {
-          rows.push([
-            order.customer.name,
-            order.customer.tpNumber,
-            order.customer.phone,
-            order.customer.email,
-            order.customer.wechatId || "",
-            order.paymentMethod,
-            product.name,
-            product.quantity,
-            parseFloat(product.price).toFixed(2) + " €",
-            product.points
-          ]);
-        });
-      });
-      let wb = XLSX.utils.book_new();
-      let ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [
-        { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 20 },
-        { wch: 15 }, { wch: 20 }, { wch: 10 }, { wch: 12 }, { wch: 10 }
-      ];
-      XLSX.utils.book_append_sheet(wb, ws, "Bestellungen");
-      XLSX.writeFile(wb, "bestellungen.xlsx");
-    }
-    document.getElementById('btn-export-excel').addEventListener('click', exportOrdersToExcel);
-
-    /* ------------------ Export/Import der Produkte (Operator-Dashboard) ------------------ */
-    // Export: Erstelle eine JSON-Datei aus dem products-Array
+    /***********************
+     * Export/Import der Produkte (für den Operator)
+     ***********************/
     document.getElementById('btn-export-products').addEventListener('click', function() {
       const jsonStr = JSON.stringify(products, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -958,19 +937,15 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
-
-    // Import: Öffnet den Dateidialog
     document.getElementById('btn-import-products').addEventListener('click', function() {
       document.getElementById('import-products-input').click();
     });
-
-    // Lese die hochgeladene Datei und aktualisiere das Produkt-Array (mit erweitertem Debugging)
     document.getElementById('import-products-input').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (file) {
         console.log("Import-Datei ausgewählt:", file.name, file.size, file.type);
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
           const fileContent = e.target.result;
           console.log("Import-Datei Inhalt (erste 200 Zeichen):", fileContent.substring(0, 200));
           try {
@@ -984,8 +959,15 @@
                   prod.local = true;
                 }
               });
-              products = importedProducts;
-              selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
+              // Speichere die importierten Produkte persistent über den Server
+              for (let prod of importedProducts) {
+                // Wenn ein Produkt lokal ist, füge es über den Add-Endpoint hinzu
+                if (prod.local) {
+                  let added = await addProduct(prod);
+                  console.log("Importiertes Produkt hinzugefügt:", added);
+                }
+              }
+              await loadProducts();
               renderOperatorProducts();
               renderProduktList();
               alert("Produkte erfolgreich importiert.");
@@ -996,7 +978,6 @@
             alert("Fehler beim Importieren der Produkte: " + error);
             console.error("JSON-Parsing-Fehler:", error);
           }
-          // Setze den Input zurück, damit das Change-Event bei erneutem Import ausgelöst wird.
           event.target.value = "";
         };
         reader.onerror = function(e) {
@@ -1009,7 +990,9 @@
       }
     });
 
-    /* ------------------ Modal: Passwort ändern ------------------ */
+    /***********************
+     * Modal: Passwort ändern
+     ***********************/
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
       document.getElementById('modal-change-password').classList.add('active');
     });
