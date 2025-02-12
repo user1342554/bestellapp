@@ -1,37 +1,9 @@
-// Versuche, eine Dummy-Implementierung von localStorage zu erzwingen,
-// falls der Zugriff in diesem Kontext nicht erlaubt ist.
-try {
-  // Versuche, die Eigenschaft global.localStorage neu zu definieren.
-  Object.defineProperty(global, 'localStorage', {
-    value: {
-      getItem: () => null,
-      setItem: () => {},
-      removeItem: () => {}
-    },
-    configurable: true
-  });
-} catch (err) {
-  // Falls das fehlschlägt, versuchen wir es mit globalThis.
-  try {
-    Object.defineProperty(globalThis, 'localStorage', {
-      value: {
-        getItem: () => null,
-        setItem: () => {},
-        removeItem: () => {}
-      },
-      configurable: true
-    });
-  } catch (err2) {
-    console.warn("Konnte localStorage nicht überschreiben:", err2);
-  }
-}
-
 import faunadb from "faunadb";
 
-// Den FaunaDB-Client instanziieren
+// Den FaunaDB-Client instanziieren und explizit die API-Version auf 3 setzen
 const client = new faunadb.Client({
   secret: process.env.FAUNA_SECRET,
-  // Optional: domain: 'db.eu.fauna.com',
+  headers: { "X-FaunaDB-API-Version": "3" },
 });
 
 // Alias für die Query-Funktionen
