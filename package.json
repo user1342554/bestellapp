@@ -18,7 +18,8 @@
     "node": "16.x"
   },
 "dependencies": {
-  "faunadb": "3.14.2"
+  "faunadb": "3.4.1"
 }
+
 
 }
