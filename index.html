@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <title>Bestell-App</title>
@@ -22,12 +23,14 @@
       --border-radius: 10px;
       --transition-speed: 0.3s;
     }
+
     /* =================== Reset & Basis =================== */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
       font-family: var(--font-family);
       background-color: var(--background-color);
@@ -35,22 +38,25 @@
       line-height: 1.6;
       padding: 20px;
     }
+
     .container {
       max-width: 800px;
       margin: 40px auto;
       background: var(--container-bg);
       border-radius: var(--border-radius);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 30px;
       position: relative;
       overflow: hidden;
     }
+
     /* =================== Zentrierte Header =================== */
     .header {
       position: relative;
       padding: 10px 0;
       text-align: center;
     }
+
     .header .back-button {
       position: absolute;
       left: 10px;
@@ -64,14 +70,17 @@
       padding: 8px;
       transition: color var(--transition-speed);
     }
+
     .header .back-button:disabled {
       color: #ccc;
       cursor: default;
     }
+
     .header .title {
       font-size: 24px;
       font-weight: 600;
     }
+
     /* =================== Screens & Animation =================== */
     .screen {
       display: none;
@@ -79,15 +88,18 @@
       transform: translateY(20px);
       animation: fadeIn 0.4s forwards;
     }
+
     .screen.active {
       display: block;
     }
+
     @keyframes fadeIn {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
     /* =================== Buttons, Footer & Links =================== */
     button {
       padding: 12px 20px;
@@ -100,13 +112,16 @@
       margin: 10px 0;
       transition: background-color var(--transition-speed), transform 0.2s;
     }
+
     button:hover {
       background-color: var(--primary-color-dark);
       transform: scale(1.02);
     }
+
     button:active {
       transform: scale(0.98);
     }
+
     .link-button {
       background: none;
       border: none;
@@ -116,6 +131,7 @@
       text-decoration: underline;
       padding: 0;
     }
+
     .footer {
       text-align: center;
       font-size: 12px;
@@ -124,9 +140,11 @@
       cursor: pointer;
       transition: color var(--transition-speed);
     }
+
     .footer:hover {
       color: var(--primary-color);
     }
+
     /* =================== Formulare & Eingabefelder =================== */
     input[type="text"],
     input[type="email"],
@@ -141,16 +159,19 @@
       font-size: 16px;
       transition: border-color var(--transition-speed);
     }
+
     input:focus {
       border-color: var(--primary-color);
       outline: none;
     }
+
     input[type="file"] {
       position: absolute;
       opacity: 0;
       width: 1px;
       height: 1px;
     }
+
     .label-file {
       display: inline-block;
       padding: 12px 20px;
@@ -162,9 +183,11 @@
       transition: background-color var(--transition-speed);
       margin: 10px 0;
     }
+
     .label-file:hover {
       background-color: #e0e0e0;
     }
+
     /* =================== Produktkarten & Grid-Layout =================== */
     .product-card {
       border: 1px solid #eee;
@@ -178,10 +201,12 @@
       margin-bottom: 10px;
       font-size: 14px;
     }
+
     .product-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     }
+
     .product-image {
       width: 100%;
       max-height: 80px;
@@ -189,6 +214,7 @@
       border-radius: var(--border-radius);
       margin-bottom: 4px;
     }
+
     .product-description {
       font-size: 12px;
       color: #555;
@@ -196,12 +222,14 @@
       margin-top: 4px;
       text-align: center;
     }
+
     #produkt-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 10px;
       margin-top: 20px;
     }
+
     /* =================== Tabellen (Bestellübersicht) =================== */
     .order-table {
       width: 100%;
@@ -211,15 +239,18 @@
       table-layout: fixed;
       word-wrap: break-word;
     }
+
     .order-table th,
     .order-table td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: left;
     }
+
     .order-table th {
       background-color: #f2f2f2;
     }
+
     /* =================== Bestell-Akkordeon =================== */
     .order-item {
       border: 1px solid #ddd;
@@ -227,6 +258,7 @@
       border-radius: 6px;
       overflow: hidden;
     }
+
     .order-header {
       background-color: #f2f2f2;
       padding: 8px;
@@ -235,10 +267,12 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .order-details {
       padding: 8px;
       display: none;
     }
+
     .delete-order-btn {
       background: transparent;
       border: none;
@@ -246,19 +280,23 @@
       padding: 4px;
       outline: none;
     }
+
     .delete-order-btn svg {
       width: 20px;
       height: 20px;
       fill: var(--accent-color);
       transition: fill var(--transition-speed), transform 0.2s;
     }
+
     .delete-order-btn:hover svg {
       fill: #c0392b;
       transform: scale(1.1);
     }
+
     .delete-order-btn:active svg {
       transform: scale(0.95);
     }
+
     #btn-clear-all-orders {
       background-color: var(--accent-color);
       color: #fff;
@@ -269,13 +307,16 @@
       transition: background-color var(--transition-speed), transform 0.2s;
       font-size: 16px;
     }
+
     #btn-clear-all-orders:hover {
       background-color: #c0392b;
       transform: scale(1.02);
     }
+
     #btn-clear-all-orders:active {
       transform: scale(0.98);
     }
+
     /* =================== Operator-Aktionsbereich (Passwort ändern, Export/Import) =================== */
     .operator-actions-wrapper {
       display: flex;
@@ -285,18 +326,22 @@
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
+
     .export-import-wrapper {
       display: flex;
       gap: 10px;
       align-items: center;
       flex-wrap: wrap;
     }
+
     .export-import-wrapper button {
       background-color: var(--secondary-color);
     }
+
     .export-import-wrapper button:hover {
       background-color: #444;
     }
+
     /* =================== Modal (Passwort ändern) =================== */
     .modal {
       position: fixed;
@@ -304,38 +349,44 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       display: none;
       align-items: center;
       justify-content: center;
       animation: fadeIn 0.4s;
       z-index: 1000;
     }
+
     .modal.active {
       display: flex;
     }
+
     .modal-content {
       background: var(--container-bg);
       padding: 20px;
       border-radius: var(--border-radius);
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
+
     /* =================== Responsive =================== */
     @media (max-width: 480px) {
       .header .title {
         font-size: 20px;
       }
+
       button {
         font-size: 14px;
       }
+
       .container {
         padding: 20px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <!-- Kundendaten Screen -->
@@ -372,16 +423,19 @@
         <button class="back-button" id="back-operator-dashboard">&larr; Zurück</button>
         <div class="title">Operator Dashboard</div>
       </div>
+      <!-- Gemeinsamer Aktionsbereich: Passwort ändern, Export/Import -->
       <div class="operator-actions-wrapper">
         <button id="btn-show-change-password" style="background-color: var(--secondary-color);">Passwort ändern</button>
         <div class="export-import-wrapper">
           <button id="btn-export-products">Produkte exportieren</button>
           <button id="btn-import-products">Produkte importieren</button>
+          <!-- Verstecktes Input-Feld zum Hochladen -->
           <input type="file" id="import-products-input" style="display:none;" accept="application/json">
         </div>
       </div>
       <div id="operator-products-list"></div>
       <button id="btn-show-add-product">+ Neues Produkt hinzufügen</button>
+      <!-- Formular: Produkt hinzufügen / bearbeiten -->
       <div id="add-product-form" style="display:none;">
         <h3 id="form-title">Neues Produkt</h3>
         <form id="form-add-product">
@@ -446,7 +500,8 @@
     </div>
   </div>
   <script>
-    // --- Globale Variablen ---
+    /* ------------------ Globale Variablen & IP-Erfassung ------------------ */
+    let operatorPassword = "1234";
     let products = [];
     let orders = [];
     try {
@@ -459,7 +514,7 @@
     let selectedProducts = [];
     let selectedOrder = [];
     let clientIP = "";
-    let editingProduct = null;
+    let editingProduct = null; // speichert aktuell zu bearbeitendes Produkt
 
     fetch('https://api.ipify.org?format=json')
       .then(res => res.json())
@@ -469,7 +524,7 @@
     let navHistory = [];
     let currentScreen = "screen-kundendaten";
 
-    // --- Navigation ---
+    /* ------------------ Navigation & Screen-Wechsel ------------------ */
     function showScreen(screenId, pushHistory = true) {
       if (pushHistory && currentScreen && currentScreen !== screenId) {
         navHistory.push(currentScreen);
@@ -491,7 +546,7 @@
       f.addEventListener('click', () => { showScreen("screen-operator-login"); });
     });
 
-    // --- Formular: Kundendaten ---
+    /* ------------------ Formulare & Produkte laden ------------------ */
     document.getElementById('form-kundendaten').addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('input-name').value.trim();
@@ -502,6 +557,7 @@
       if (name && tpNumber && phone && email) {
         await loadProducts();
         currentCustomer = { name, tpNumber, phone, email, wechatId, ip: clientIP };
+        // Für den Shop-Bereich wird das lokale Array "selectedProducts" gesetzt:
         selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
         renderProduktList();
         showScreen("screen-produktauswahl");
@@ -510,34 +566,23 @@
       }
     });
 
-    // --- Operator Login (Backend-Authentifizierung) ---
     document.getElementById('form-operator-login').addEventListener('submit', async e => {
       e.preventDefault();
-      const password = document.getElementById('input-operator-password').value;
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: "admin", password })
-        });
-        if (!res.ok) throw new Error("Login fehlgeschlagen");
-        const data = await res.json();
-        window.authToken = data.token;
-        await loadProducts();
+      const inputPass = document.getElementById('input-operator-password').value;
+      if (inputPass === operatorPassword) {
+        if (products.length === 0) {
+          await loadProducts();
+        }
         renderOperatorProducts();
         showScreen("screen-operator-dashboard");
-      } catch (err) {
-        console.error(err);
-        alert("Login fehlgeschlagen.");
+      } else {
+        alert("Ungültiges Passwort.");
       }
     });
 
-    // --- Produkte laden ---
     async function loadProducts() {
       try {
-        const res = await fetch('/api/products', {
-          headers: { 'Authorization': `Bearer ${window.authToken}` }
-        });
+        const res = await fetch('/.netlify/functions/products');
         if (!res.ok) throw new Error(res.statusText);
         let data;
         try {
@@ -553,18 +598,14 @@
       }
     }
 
-    // --- Produkt hinzufügen ---
     async function addProduct(newProduct) {
       try {
-        const response = await fetch('/api/products', {
+        const response = await fetch('/.netlify/functions/products', {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.authToken}`
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newProduct),
         });
-        if (!response.ok) throw new Error(`Fehler beim Hinzufügen: ${response.statusText}`);
+        if (!response.ok) throw new Error(Fehler beim Hinzufügen: ${ response.statusText });
         return await response.json();
       } catch (err) {
         console.error("Fehler beim Hinzufügen des Produkts:", err);
@@ -572,18 +613,14 @@
       }
     }
 
-    // --- Produkt aktualisieren ---
     async function updateProduct(productId, updatedProduct) {
       try {
-        const response = await fetch(`/api/products/${productId}`, {
+        const response = await fetch(/.netlify/functions / products ? id = ${ productId }, {
           method: 'PUT',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.authToken}`
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedProduct),
         });
-        if (!response.ok) throw new Error(`Fehler beim Aktualisieren: ${response.statusText}`);
+        if (!response.ok) throw new Error(Fehler beim Aktualisieren: ${ response.statusText });
         return await response.json();
       } catch (err) {
         console.error("Fehler beim Aktualisieren des Produkts:", err);
@@ -591,14 +628,12 @@
       }
     }
 
-    // --- Produkt löschen ---
     async function deleteProduct(productId) {
       try {
-        const response = await fetch(`/api/products/${productId}`, {
+        const response = await fetch(/.netlify/functions / products ? id = ${ productId }, {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${window.authToken}` }
         });
-        if (!response.ok) throw new Error(`Fehler beim Löschen: ${response.statusText}`);
+        if (!response.ok) throw new Error(Fehler beim Löschen: ${ response.statusText });
         return await response.json();
       } catch (err) {
         console.error("Fehler beim Löschen des Produkts:", err);
@@ -606,8 +641,8 @@
       }
     }
 
-    // --- Operator Produkte anzeigen ---
     async function renderOperatorProducts() {
+      // Falls noch keine Produkte geladen wurden, lade sie vom Backend.
       if (products.length === 0) {
         await loadProducts();
       }
@@ -618,386 +653,411 @@
         prodDiv.classList.add('product-card');
         let html = "";
         if (product.imageData) {
-          html += `<img class="product-image" src="${product.imageData}" alt="${product.name}">`;
+          html += <img class="product-image" src="${product.imageData}" alt="${product.name}">;
         } else {
-          html += `<div style="width:100%;height:80px;background:#eee;border-radius:var(--border-radius);margin-bottom:4px;display:flex;align-items:center;justify-content:center;">Kein Bild</div>`;
+              html += <div style="width:100%;height:80px;background:#eee;border-radius:var(--border-radius);margin-bottom:4px;display:flex;align-items:center;justify-content:center;">Kein Bild</div>;
         }
-        html += `<strong>${product.name}</strong>`;
-        if (product.description) {
-          html += `<div class="product-description">${product.description}</div>`;
+            html += <strong>${product.name}</strong>;
+            if (product.description) {
+              html += <div class="product-description">${product.description}</div>;
         }
-        html += `<br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
-                 Punkte: ${product.points}<br>`;
-        prodDiv.innerHTML = html;
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = "Entfernen";
-        removeBtn.style.backgroundColor = "#FF3B30";
+            html += <br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
+              Punkte: ${product.points}<br>;
+                prodDiv.innerHTML = html;
+                // Entfernen-Button
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = "Entfernen";
+                removeBtn.style.backgroundColor = "#FF3B30";
         removeBtn.addEventListener('click', async () => {
           try {
-            await deleteProduct(product.id);
-            products.splice(index, 1);
-            renderOperatorProducts();
+                  await deleteProduct(product.id);
+                products.splice(index, 1);
+                renderOperatorProducts();
           } catch (err) {
-            console.error("Fehler beim Löschen des Produkts:", err);
+                  console.error("Fehler beim Löschen des Produkts:", err);
           }
         });
-        const editBtn = document.createElement('button');
-        editBtn.textContent = "Bearbeiten";
-        editBtn.style.backgroundColor = "#FFA500";
+                // Bearbeiten-Button
+                const editBtn = document.createElement('button');
+                editBtn.textContent = "Bearbeiten";
+                editBtn.style.backgroundColor = "#FFA500";
         editBtn.addEventListener('click', () => {
-          document.getElementById('input-product-name').value = product.name;
-          document.getElementById('input-product-price').value = product.price;
-          document.getElementById('input-product-points').value = product.points;
-          document.getElementById('input-product-description').value = product.description || "";
-          editingProduct = { index, product };
-          document.getElementById('form-title').textContent = "Produkt bearbeiten";
-          document.getElementById('add-product-form').style.display = "block";
+                  document.getElementById('input-product-name').value = product.name;
+                document.getElementById('input-product-price').value = product.price;
+                document.getElementById('input-product-points').value = product.points;
+                document.getElementById('input-product-description').value = product.description || "";
+                editingProduct = {index, product};
+                document.getElementById('form-title').textContent = "Produkt bearbeiten";
+                document.getElementById('add-product-form').style.display = "block";
         });
-        prodDiv.appendChild(editBtn);
-        prodDiv.appendChild(removeBtn);
-        listDiv.appendChild(prodDiv);
+                prodDiv.appendChild(editBtn);
+                prodDiv.appendChild(removeBtn);
+                listDiv.appendChild(prodDiv);
       });
     }
 
     document.getElementById('btn-show-add-product').addEventListener('click', () => {
-      editingProduct = null;
-      document.getElementById('form-add-product').reset();
-      document.getElementById('form-title').textContent = "Neues Produkt";
-      document.getElementById('add-product-form').style.display = "block";
+                  editingProduct = null;
+                document.getElementById('form-add-product').reset();
+                document.getElementById('form-title').textContent = "Neues Produkt";
+                document.getElementById('add-product-form').style.display = "block";
     });
 
     document.getElementById('btn-cancel-add-product').addEventListener('click', () => {
-      document.getElementById('add-product-form').style.display = "none";
-      editingProduct = null;
+                  document.getElementById('add-product-form').style.display = "none";
+                editingProduct = null;
     });
 
     document.getElementById('form-add-product').addEventListener('submit', async e => {
-      e.preventDefault();
-      const name = document.getElementById('input-product-name').value.trim();
-      const priceStr = document.getElementById('input-product-price').value.trim().replace(',', '.');
-      const points = parseInt(document.getElementById('input-product-points').value.trim()) || 0;
-      const description = document.getElementById('input-product-description').value.trim();
-      const imageInput = document.getElementById('input-product-image');
-      if (!name || !priceStr || (!editingProduct && (!imageInput.files || !imageInput.files[0]))) {
-        alert("Bitte alle erforderlichen Felder ausfüllen und ein Bild auswählen (bei neuen Produkten).");
-        return;
+                  e.preventDefault();
+                const name = document.getElementById('input-product-name').value.trim();
+                const priceStr = document.getElementById('input-product-price').value.trim().replace(',', '.');
+                const points = parseInt(document.getElementById('input-product-points').value.trim()) || 0;
+                const description = document.getElementById('input-product-description').value.trim();
+                const imageInput = document.getElementById('input-product-image');
+                if (!name || !priceStr || (!editingProduct && (!imageInput.files || !imageInput.files[0]))) {
+                  alert("Bitte alle erforderlichen Felder ausfüllen und ein Bild auswählen (bei neuen Produkten).");
+                return;
       }
-      const price = parseFloat(priceStr);
-      if (isNaN(price)) {
-        alert("Ungültiger Preis!");
-        return;
+                const price = parseFloat(priceStr);
+                if (isNaN(price)) {
+                  alert("Ungültiger Preis!");
+                return;
       }
+      // Bild lesen (falls vorhanden)
       const readImage = () => {
         return new Promise((resolve, reject) => {
           if (imageInput.files && imageInput.files[0]) {
             const reader = new FileReader();
             reader.onload = (evt) => resolve(evt.target.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(imageInput.files[0]);
+                reader.onerror = reject;
+                reader.readAsDataURL(imageInput.files[0]);
           } else {
-            resolve(null);
+                  resolve(null);
           }
         });
       };
-      try {
+                try {
         const imageData = await readImage();
-        const productData = { name, price, points, description };
-        if (imageData) {
-          productData.imageData = imageData;
+                const productData = {name, price, points, description};
+                if (imageData) {
+                  productData.imageData = imageData;
         }
-        if (editingProduct) {
+                if (editingProduct) {
           const updated = await updateProduct(editingProduct.product.id, productData);
-          products[editingProduct.index] = updated;
-          editingProduct = null;
+                products[editingProduct.index] = updated;
+                editingProduct = null;
         } else {
           const savedProduct = await addProduct(productData);
-          products.push(savedProduct);
+                products.push(savedProduct);
         }
-        renderOperatorProducts();
-        document.getElementById('form-add-product').reset();
-        document.getElementById('add-product-form').style.display = "none";
+                renderOperatorProducts();
+                document.getElementById('form-add-product').reset();
+                document.getElementById('add-product-form').style.display = "none";
       } catch (err) {
-        console.error("Fehler beim Speichern des Produkts:", err);
-        alert("Fehler beim Speichern des Produkts.");
+                  console.error("Fehler beim Speichern des Produkts:", err);
+                alert("Fehler beim Speichern des Produkts.");
       }
     });
 
-    function renderProduktList() {
+                function renderProduktList() {
       const listDiv = document.getElementById('produkt-list');
-      listDiv.innerHTML = "";
+                listDiv.innerHTML = "";
+      // Die Shop-Anzeige basiert auf selectedProducts.
       selectedProducts.forEach((product, index) => {
         const prodDiv = document.createElement('div');
-        prodDiv.classList.add('product-card');
-        let html = "";
-        if (product.imageData) {
-          html += `<img class="product-image" src="${product.imageData}" alt="${product.name}">`;
+                prodDiv.classList.add('product-card');
+                let html = "";
+                if (product.imageData) {
+                  html += <img class="product-image" src="${product.imageData}" alt="${product.name}">;
         } else {
-          html += `<div style="width:100%;height:80px;background:#eee;border-radius:var(--border-radius);margin-bottom:4px;display:flex;align-items:center;justify-content:center;">Kein Bild</div>`;
+                      html += <div style="width:100%;height:80px;background:#eee;border-radius:var(--border-radius);margin-bottom:4px;display:flex;align-items:center;justify-content:center;">Kein Bild</div>;
         }
-        html += `<strong>${product.name}</strong>`;
-        if (product.description) {
-          html += `<div class="product-description">${product.description}</div>`;
+                    html += <strong>${product.name}</strong>;
+                    if (product.description) {
+                      html += <div class="product-description">${product.description}</div>;
         }
-        html += `<br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
-                 <div style="display:flex;justify-content:center;align-items:center;margin-top:8px;">
-                   <button style="width:30px;" onclick="decreaseQuantity(${index})">-</button>
-                   <span style="margin:0 8px;">${product.quantity}</span>
-                   <button style="width:30px;" onclick="increaseQuantity(${index})">+</button>
-                 </div>`;
-        prodDiv.innerHTML = html;
-        listDiv.appendChild(prodDiv);
+                    html += <br><small>${parseFloat(product.price).toFixed(2)} €</small><br>
+                      <div style="display:flex;justify-content:center;align-items:center;margin-top:8px;">
+                        <button style="width:30px;" onclick="decreaseQuantity(${index})">-</button>
+                        <span style="margin:0 8px;">${product.quantity}</span>
+                        <button style="width:30px;" onclick="increaseQuantity(${index})">+</button>
+                      </div>;
+                      prodDiv.innerHTML = html;
+                      listDiv.appendChild(prodDiv);
       });
     }
 
-    function decreaseQuantity(i) {
+                      function decreaseQuantity(i) {
       if (selectedProducts[i].quantity > 0) {
-        selectedProducts[i].quantity--;
-        renderProduktList();
+                        selectedProducts[i].quantity--;
+                      renderProduktList();
       }
     }
-    function increaseQuantity(i) {
-      selectedProducts[i].quantity++;
-      renderProduktList();
+                      function increaseQuantity(i) {
+                        selectedProducts[i].quantity++;
+                      renderProduktList();
     }
 
     document.getElementById('btn-submit-order').addEventListener('click', () => {
       const orderProducts = selectedProducts.filter(p => p.quantity > 0);
-      if (orderProducts.length === 0) {
-        alert("Bitte wählen Sie mindestens ein Produkt aus.");
-        return;
+                      if (orderProducts.length === 0) {
+                        alert("Bitte wählen Sie mindestens ein Produkt aus.");
+                      return;
       }
-      selectedOrder = orderProducts;
-      showScreen("screen-zahlungsart");
+                      selectedOrder = orderProducts;
+                      showScreen("screen-zahlungsart");
     });
 
     document.querySelectorAll('.payment-option').forEach(button => {
-      button.addEventListener('click', () => {
-        const paymentMethod = button.dataset.method;
-        let totalPrice = 0;
-        let totalPoints = 0;
-        selectedOrder.forEach(p => {
-          totalPrice += p.price * p.quantity;
-          totalPoints += p.points * p.quantity;
-        });
-        const order = {
-          customer: currentCustomer,
-          products: selectedOrder,
-          paymentMethod,
-          totalPrice,
-          totalPoints,
-          clientIP,
-          timestamp: Date.now()
-        };
-        orders.push(order);
-        try {
-          localStorage.setItem('orders', JSON.stringify(orders));
-        } catch (e) {
-          console.error("Fehler beim Speichern im localStorage:", e);
-        }
-        renderOrderSummary();
-        showScreen("screen-bestelluebersicht");
-      });
+                        button.addEventListener('click', () => {
+                          const paymentMethod = button.dataset.method;
+                          let totalPrice = 0;
+                          let totalPoints = 0;
+                          selectedOrder.forEach(p => {
+                            totalPrice += p.price * p.quantity;
+                            totalPoints += p.points * p.quantity;
+                          });
+                          const order = {
+                            customer: currentCustomer,
+                            products: selectedOrder,
+                            paymentMethod,
+                            totalPrice,
+                            totalPoints,
+                            clientIP,
+                            timestamp: Date.now()
+                          };
+                          orders.push(order);
+                          try {
+                            localStorage.setItem('orders', JSON.stringify(orders));
+                          } catch (e) {
+                            console.error("Fehler beim Speichern im localStorage:", e);
+                          }
+                          renderOrderSummary();
+                          showScreen("screen-bestelluebersicht");
+                        });
     });
 
-    function renderOrderSummary() {
+                      function renderOrderSummary() {
       const summaryDiv = document.getElementById('order-summary');
-      summaryDiv.innerHTML = "";
+                      summaryDiv.innerHTML = "";
       const filteredOrders = orders.filter(o => o.clientIP === clientIP);
-      if (filteredOrders.length === 0) {
-        summaryDiv.innerHTML = "<p>Es wurden noch keine Bestellungen von Ihrer IP aufgezeichnet.</p>";
-        return;
+                      if (filteredOrders.length === 0) {
+                        summaryDiv.innerHTML = "<p>Es wurden noch keine Bestellungen von Ihrer IP aufgezeichnet.</p>";
+                      return;
       }
       filteredOrders.forEach(order => {
         const orderDate = new Date(order.timestamp);
-        const dateStr = orderDate.toLocaleString();
-        const orderItem = document.createElement('div');
-        orderItem.classList.add('order-item');
-        const orderHeader = document.createElement('div');
-        orderHeader.classList.add('order-header');
-        const headerText = document.createElement('span');
-        headerText.textContent = `Bestellung vom ${dateStr}`;
-        const deleteBtn = document.createElement('button');
-        deleteBtn.classList.add('delete-order-btn');
-        deleteBtn.setAttribute("aria-label", "Bestellung löschen");
-        deleteBtn.innerHTML = `
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6Z"/>
-          </svg>
-        `;
+                      const dateStr = orderDate.toLocaleString();
+                      const orderItem = document.createElement('div');
+                      orderItem.classList.add('order-item');
+                      const orderHeader = document.createElement('div');
+                      orderHeader.classList.add('order-header');
+                      const headerText = document.createElement('span');
+                      headerText.textContent = Bestellung vom ${dateStr};
+                      const deleteBtn = document.createElement('button');
+                      deleteBtn.classList.add('delete-order-btn');
+                      deleteBtn.setAttribute("aria-label", "Bestellung löschen");
+                      deleteBtn.innerHTML =
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6Z" />
+                      </svg>
+                      ;
         deleteBtn.addEventListener('click', (event) => {
-          event.stopPropagation();
-          if (confirm("Diese Bestellung wirklich löschen?")) {
-            orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
-            localStorage.setItem('orders', JSON.stringify(orders));
-            renderOrderSummary();
+                        event.stopPropagation();
+                      if (confirm("Diese Bestellung wirklich löschen?")) {
+                        orders = orders.filter(o => !(o.timestamp === order.timestamp && o.clientIP === order.clientIP));
+                      localStorage.setItem('orders', JSON.stringify(orders));
+                      renderOrderSummary();
           }
         });
-        orderHeader.appendChild(headerText);
-        orderHeader.appendChild(deleteBtn);
-        const orderDetails = document.createElement('div');
-        orderDetails.classList.add('order-details');
-        let detailsHTML = `<table class="order-table">
-          <tr><th>Feld</th><th>Wert</th></tr>
-          <tr><td>Name</td><td>${order.customer.name}</td></tr>
-          <tr><td>TP-Nummer</td><td>${order.customer.tpNumber}</td></tr>
-          <tr><td>Telefon</td><td>${order.customer.phone}</td></tr>
-          <tr><td>E-Mail</td><td>${order.customer.email}</td></tr>`;
-        if (order.customer.wechatId) {
-          detailsHTML += `<tr><td>WeChat ID</td><td>${order.customer.wechatId}</td></tr>`;
+                      orderHeader.appendChild(headerText);
+                      orderHeader.appendChild(deleteBtn);
+                      const orderDetails = document.createElement('div');
+                      orderDetails.classList.add('order-details');
+                      let detailsHTML = <table class="order-table">
+                        <tr><th>Feld</th><th>Wert</th></tr>
+                        <tr><td>Name</td><td>${order.customer.name}</td></tr>
+                        <tr><td>TP-Nummer</td><td>${order.customer.tpNumber}</td></tr>
+                        <tr><td>Telefon</td><td>${order.customer.phone}</td></tr>
+                        <tr><td>E-Mail</td><td>${order.customer.email}</td></tr>;
+                        if (order.customer.wechatId) {
+                          detailsHTML += <tr><td>WeChat ID</td><td>${order.customer.wechatId}</td></tr>;
         }
-        detailsHTML += `<tr><td>Zahlungsart</td><td>${order.paymentMethod}</td></tr>
-          </table>
-          <h4>Produkte</h4>
-          <table class="order-table">
-            <tr>
-              <th>Produkt</th>
-              <th>Menge</th>
-              <th>Preis</th>
-              <th>Punkte</th>
-            </tr>`;
+                        detailsHTML += <tr><td>Zahlungsart</td><td>${order.paymentMethod}</td></tr>
+                      </table>
+                      <h4>Produkte</h4>
+                      <table class="order-table">
+                        <tr>
+                          <th>Produkt</th>
+                          <th>Menge</th>
+                          <th>Preis</th>
+                          <th>Punkte</th>
+                        </tr>;
         order.products.forEach(p => {
-          detailsHTML += `<tr>
+                          detailsHTML += <tr>
                             <td>${p.name}</td>
                             <td>${p.quantity}</td>
                             <td>${parseFloat(p.price).toFixed(2)} €</td>
                             <td>${p.points}</td>
-                          </tr>`;
+                          </tr>;
         });
-        detailsHTML += `</table>
-          <p><strong>Gesamtsumme:</strong> ${parseFloat(order.totalPrice).toFixed(2)} €</p>
-          <p><strong>Gesamtpunkte:</strong> ${order.totalPoints}</p>`;
-        orderDetails.innerHTML = detailsHTML;
+                        detailsHTML += </table>
+                      <p><strong>Gesamtsumme:</strong> ${parseFloat(order.totalPrice).toFixed(2)} €</p>
+                      <p><strong>Gesamtpunkte:</strong> ${order.totalPoints}</p>;
+                      orderDetails.innerHTML = detailsHTML;
         orderHeader.addEventListener('click', () => {
-          orderDetails.style.display = (orderDetails.style.display === "none" || orderDetails.style.display === "") ? "block" : "none";
+                        orderDetails.style.display = (orderDetails.style.display === "none" || orderDetails.style.display === "") ? "block" : "none";
         });
-        orderItem.appendChild(orderHeader);
-        orderItem.appendChild(orderDetails);
-        summaryDiv.appendChild(orderItem);
+                      orderItem.appendChild(orderHeader);
+                      orderItem.appendChild(orderDetails);
+                      summaryDiv.appendChild(orderItem);
       });
     }
 
     document.getElementById('btn-new-order').addEventListener('click', () => {
-      currentCustomer = {};
-      selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
-      showScreen("screen-kundendaten");
+                        currentCustomer = {};
+      // Beim Wechsel in den Shop wird selectedProducts aus dem aktuellen products-Array neu gesetzt.
+      selectedProducts = products.map(p => ({...p, quantity: 0 }));
+                      showScreen("screen-kundendaten");
     });
 
     document.getElementById('btn-clear-all-orders').addEventListener('click', () => {
       if (confirm("Möchtest du wirklich ALLE Bestellungen löschen?")) {
-        orders = [];
-        localStorage.setItem('orders', JSON.stringify(orders));
-        renderOrderSummary();
+                        orders = [];
+                      localStorage.setItem('orders', JSON.stringify(orders));
+                      renderOrderSummary();
       }
     });
 
-    // --- Export in Excel (SheetJS) ---
-    function exportOrdersToExcel() {
+                      /* ------------------ Export in Excel (SheetJS) ------------------ */
+                      function exportOrdersToExcel() {
       const filteredOrders = orders.filter(o => o.clientIP === clientIP);
-      if (filteredOrders.length === 0) {
-        alert("Keine Bestellungen vorhanden.");
-        return;
+                      if (filteredOrders.length === 0) {
+                        alert("Keine Bestellungen vorhanden.");
+                      return;
       }
-      let rows = [];
-      rows.push(["Name", "TP-Nummer", "Telefon", "E-Mail", "WeChat ID", "Zahlungsart", "Produkt", "Anzahl", "Preis", "Punkte"]);
+                      let rows = [];
+                      rows.push(["Name", "TP-Nummer", "Telefon", "E-Mail", "WeChat ID", "Zahlungsart", "Produkt", "Anzahl", "Preis", "Punkte"]);
       filteredOrders.forEach(order => {
-        order.products.forEach(product => {
-          rows.push([
-            order.customer.name,
-            order.customer.tpNumber,
-            order.customer.phone,
-            order.customer.email,
-            order.customer.wechatId || "",
-            order.paymentMethod,
-            product.name,
-            product.quantity,
-            parseFloat(product.price).toFixed(2) + " €",
-            product.points
-          ]);
-        });
+                        order.products.forEach(product => {
+                          rows.push([
+                            order.customer.name,
+                            order.customer.tpNumber,
+                            order.customer.phone,
+                            order.customer.email,
+                            order.customer.wechatId || "",
+                            order.paymentMethod,
+                            product.name,
+                            product.quantity,
+                            parseFloat(product.price).toFixed(2) + " €",
+                            product.points
+                          ]);
+                        });
       });
-      let wb = XLSX.utils.book_new();
-      let ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [
-        { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 20 },
-        { wch: 15 }, { wch: 20 }, { wch: 10 }, { wch: 12 }, { wch: 10 }
-      ];
-      XLSX.utils.book_append_sheet(wb, ws, "Bestellungen");
-      XLSX.writeFile(wb, "bestellungen.xlsx");
+                      let wb = XLSX.utils.book_new();
+                      let ws = XLSX.utils.aoa_to_sheet(rows);
+                      ws['!cols'] = [
+                      {wch: 20 }, {wch: 15 }, {wch: 15 }, {wch: 25 }, {wch: 20 },
+                      {wch: 15 }, {wch: 20 }, {wch: 10 }, {wch: 12 }, {wch: 10 }
+                      ];
+                      XLSX.utils.book_append_sheet(wb, ws, "Bestellungen");
+                      XLSX.writeFile(wb, "bestellungen.xlsx");
     }
-    document.getElementById('btn-export-excel').addEventListener('click', exportOrdersToExcel);
+                      document.getElementById('btn-export-excel').addEventListener('click', exportOrdersToExcel);
 
-    // --- Export/Import der Produkte ---
-    document.getElementById('btn-export-products').addEventListener('click', function() {
+                      /* ------------------ Export/Import der Produkte (Operator-Dashboard) ------------------ */
+                      // Export: Erstelle eine JSON-Datei aus dem products-Array
+                      document.getElementById('btn-export-products').addEventListener('click', function() {
       const jsonStr = JSON.stringify(products, null, 2);
-      const blob = new Blob([jsonStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'produkte-template.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+                      const blob = new Blob([jsonStr], {type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'produkte-template.json';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
     });
 
-    document.getElementById('btn-import-products').addEventListener('click', function() {
-      document.getElementById('import-products-input').click();
+                      // Import: Öffnet den Dateidialog
+                      document.getElementById('btn-import-products').addEventListener('click', function() {
+                        document.getElementById('import-products-input').click();
     });
 
-    document.getElementById('import-products-input').addEventListener('change', async function(event) {
+                      // Lese die hochgeladene Datei und speichere die Produkte über addProduct,
+                      // sodass sie im Backend persistent angelegt werden.
+                      document.getElementById('import-products-input').addEventListener('change', async function(event) {
       const file = event.target.files[0];
-      if (!file) {
-        alert("Keine Datei ausgewählt.");
-        return;
+                      if (!file) {
+                        alert("Keine Datei ausgewählt.");
+                      return;
       }
-      console.log("Import-Datei ausgewählt:", file.name, file.size, file.type);
-      const reader = new FileReader();
-      reader.onload = async function(e) {
+                      console.log("Import-Datei ausgewählt:", file.name, file.size, file.type);
+                      const reader = new FileReader();
+                      reader.onload = async function(e) {
         const fileContent = e.target.result;
-        console.log("Import-Datei Inhalt (erste 200 Zeichen):", fileContent.substring(0, 200));
-        try {
+                      console.log("Import-Datei Inhalt (erste 200 Zeichen):", fileContent.substring(0, 200));
+                      try {
           const importedProducts = JSON.parse(fileContent);
-          console.log("Importierte Produkte:", importedProducts);
-          if (Array.isArray(importedProducts)) {
+                      console.log("Importierte Produkte:", importedProducts);
+                      if (Array.isArray(importedProducts)) {
+            // Für jedes importierte Produkt entfernen wir ggf. die vorhandene id und speichern es neu.
             for (const importedProduct of importedProducts) {
               if (importedProduct.id) delete importedProduct.id;
-              const addedProduct = await addProduct(importedProduct);
-              console.log("Hinzugefügtes Produkt:", addedProduct);
-              products.push(addedProduct);
+                      const addedProduct = await addProduct(importedProduct);
+                      console.log("Hinzugefügtes Produkt:", addedProduct);
+                      products.push(addedProduct);
             }
-            selectedProducts = products.map(p => ({ ...p, quantity: 0 }));
-            renderOperatorProducts();
-            renderProduktList();
-            alert("Produkte erfolgreich importiert und gespeichert.");
+            // Aktualisiere auch das Array, das im Shop verwendet wird:
+            selectedProducts = products.map(p => ({...p, quantity: 0 }));
+                      renderOperatorProducts();
+                      renderProduktList();
+                      alert("Produkte erfolgreich importiert und gespeichert.");
           } else {
-            alert("Das Format der Datei ist ungültig. Es muss ein Array von Produkten enthalten.");
+                        alert("Das Format der Datei ist ungültig. Es muss ein Array von Produkten enthalten.");
           }
         } catch (error) {
-          alert("Fehler beim Importieren der Produkte: " + error);
-          console.error("JSON-Parsing-Fehler:", error);
+                        alert("Fehler beim Importieren der Produkte: " + error);
+                      console.error("JSON-Parsing-Fehler:", error);
         }
-        event.target.value = "";
+                      // Setze den Input zurück, damit ein erneutes Import-Event ausgelöst werden kann.
+                      event.target.value = "";
       };
-      reader.onerror = function(e) {
-        console.error("Fehler beim Lesen der Datei:", e);
-        alert("Fehler beim Lesen der Datei.");
+                      reader.onerror = function(e) {
+                        console.error("Fehler beim Lesen der Datei:", e);
+                      alert("Fehler beim Lesen der Datei.");
       };
-      reader.readAsText(file);
+                      reader.readAsText(file);
     });
 
-    // --- Modal: Passwort ändern (Funktion noch nicht serverseitig umgesetzt) ---
+    /* ------------------ Modal: Passwort ändern ------------------ */
     document.getElementById('btn-show-change-password').addEventListener('click', () => {
-      document.getElementById('modal-change-password').classList.add('active');
+                        document.getElementById('modal-change-password').classList.add('active');
     });
     document.getElementById('btn-cancel-change-password').addEventListener('click', () => {
-      document.getElementById('modal-change-password').classList.remove('active');
+                        document.getElementById('modal-change-password').classList.remove('active');
     });
     document.getElementById('form-change-password').addEventListener('submit', e => {
-      e.preventDefault();
-      alert("Passwort ändern Funktion ist noch nicht implementiert.");
-      document.getElementById('modal-change-password').classList.remove('active');
-      document.getElementById('form-change-password').reset();
+                        e.preventDefault();
+                      const currentPass = document.getElementById('current-password').value;
+                      const newPass = document.getElementById('new-password').value;
+                      const confirmNewPass = document.getElementById('confirm-new-password').value;
+                      if (currentPass !== operatorPassword) {
+                        alert("Aktuelles Passwort ist falsch.");
+                      return;
+      }
+                      if (newPass !== confirmNewPass) {
+                        alert("Neue Passwörter stimmen nicht überein.");
+                      return;
+      }
+                      operatorPassword = newPass;
+                      alert("Passwort erfolgreich geändert.");
+                      document.getElementById('modal-change-password').classList.remove('active');
+                      document.getElementById('form-change-password').reset();
     });
   </script>
 </body>
+
 </html>
