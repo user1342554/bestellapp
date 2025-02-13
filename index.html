@@ -450,7 +450,8 @@
   </div>
   <script>
     /* ------------------ Globale Variablen & IP-Erfassung ------------------ */
-    let operatorPassword = "1234";
+    // Das Operator-Passwort wird aus dem Local Storage geladen, wenn vorhanden, sonst auf "1234" gesetzt.
+    let operatorPassword = localStorage.getItem('operatorPassword') || "1234";
     let products = [];
     let orders = [];
     try {
@@ -997,6 +998,7 @@
         return;
       }
       operatorPassword = newPass;
+      localStorage.setItem('operatorPassword', newPass);
       alert("Passwort erfolgreich geändert.");
       document.getElementById('modal-change-password').classList.remove('active');
       document.getElementById('form-change-password').reset();
